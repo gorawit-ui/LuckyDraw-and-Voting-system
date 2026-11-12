@@ -137,6 +137,9 @@ rounded square in the center (a QR code will be placed there), pixel flame borde
 ---
 
 ## ไฟล์ที่ต้องการ (checklist ส่งกลับมา)
+
+> ✅ รอบที่ 1 ได้ครบแล้ว (2026-11-12) — ผลตรวจอยู่ที่ `docs/brand/ASSETS.md`
+
 | Path ใน `public/brand/` | ขนาด | พื้นหลัง | ความสำคัญ |
 |---|---|---|---|
 | `mascot/hero.png` | 1024² | โปร่งใส | ⭐ ต้องมี |

@@ -12,6 +12,11 @@ const body = Anuphan({ subsets: ['thai', 'latin'], weight: ['400', '500', '600',
 const pixel = Press_Start_2P({ subsets: ['latin'], weight: '400', variable: '--font-pixel', display: 'swap' });
 
 export const metadata: Metadata = {
+  // ให้ og:image เป็น URL เต็ม (Vercel ตั้ง VERCEL_PROJECT_PRODUCTION_URL ให้อัตโนมัติ)
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ??
+      (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : 'http://localhost:3000'),
+  ),
   title: { default: `${site.name} · ${site.nameTh}`, template: `%s · ${site.name}` },
   description: site.tagline,
 };
