@@ -7,6 +7,9 @@ Handoff เดิม (`costume-vote/SPEC.md` §3) **เคยตัด Vercel �
 2. ใช้ Hobby เฉพาะ demo สั้นๆ ไม่มีข้อมูลจริง แล้วลบทิ้ง (ให้หัวหน้า/IT รับทราบ)
 3. ข้าม Vercel ไป deploy `outing-demo` บน Cloud Run เลย (ขั้นตอนด้านล่าง ใช้เวลา ~5 นาที)
 
+> ✅ **ตัดสินใจแล้ว (2026-11-12): ข้อ 2** — Vercel Hobby สำหรับ demo สั้นๆ ข้อมูลตัวอย่างเท่านั้น **ห้ามใส่ env Slack/Sheet/Firebase จริง** แล้วลบ project หลังจบ demo
+> ลบ: Vercel → Project → Settings → General → Delete Project
+
 โค้ดออกแบบให้ deploy ได้ทั้ง 2 ที่โดยไม่ต้องแก้ (`output: 'standalone'` + state อยู่ใน Firestore ไม่ใช่ memory)
 
 ## A. Vercel

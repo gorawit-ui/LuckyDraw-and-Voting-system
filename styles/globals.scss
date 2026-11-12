@@ -134,3 +134,52 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+// =============================================================
+//  วงล้อคู่ (/lucky/wheel)
+// =============================================================
+.btn-pop.btn-pop-red {
+  --bs-btn-bg: #{$chili}; --bs-btn-hover-bg: #{lighten($chili, 6%)}; --bs-btn-active-bg: #{$chili-deep};
+  --bs-btn-color: #fff; --bs-btn-hover-color: #fff; --bs-btn-active-color: #fff;
+  --bs-btn-disabled-bg: #{$chili}; --bs-btn-disabled-color: #fff; --bs-btn-disabled-border-color: #{$ink};
+}
+.btn-pop:disabled { box-shadow: none; transform: none; }
+.wheel-card { padding: 1rem 1rem 1.25rem; }
+.wheel-wrap {
+  position: relative;
+  width: 100%;
+  // พอดีจอโปรเจกเตอร์ 1080p: วงล้อ + ปุ่ม อยู่ในจอเดียว
+  max-width: min(100%, 60vh, 520px);
+  margin: .75rem auto 0;
+  padding-top: 18px; // เผื่อที่ให้เข็ม
+}
+.wheel-canvas { display: block; width: 100%; aspect-ratio: 1; }
+.wheel-pointer {
+  position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+  width: 44px; height: 52px; z-index: 2;
+  filter: drop-shadow(2px 3px 0 rgba($ink, .45));
+}
+.wheel-result { text-align: center; margin-top: .75rem; min-height: 4.5rem; }
+.wheel-result-val {
+  font-family: var(--font-display), sans-serif; font-weight: 900; line-height: 1.15;
+  font-size: clamp(1.5rem, 3.6vw, 2.4rem); color: rgba($ink, .25);
+  &.is-on { color: $ink; animation: pop-in .45s cubic-bezier(.3, 1.6, .5, 1); }
+}
+@keyframes pop-in { from { transform: scale(.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+.wheel-cta { min-width: min(100%, 320px); font-size: clamp(1.15rem, 2.4vw, 1.5rem); }
+.wheel-page.is-tap-to-stop { cursor: pointer; }
+.wheel-page.is-tap-to-stop .wheel-card { animation: nudge 1.2s ease-in-out infinite; }
+@keyframes nudge { 50% { box-shadow: 6px 6px 0 $ink, 0 0 0 6px rgba($mustard, .8); } }
+.wheel-settings summary { cursor: pointer; font-family: var(--font-display), sans-serif; }
+.wheel-settings .form-control { border-width: 2px; background: #fff; }
+.log-table { --bs-table-bg: transparent; th { font-size: .85rem; } }
+
+.toast-pop {
+  position: fixed; left: 50%; bottom: calc(1.25rem + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 1rem);
+  background: $ink; color: $cream; font-weight: 700; padding: .65rem 1.2rem; border-radius: 999px;
+  border: 2px solid $mustard; z-index: 1900; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+  &.show { opacity: 1; transform: translate(-50%, 0); }
+}
+
+// เต็มจอ: ซ่อน navbar ให้วงล้อใหญ่สุด
+:fullscreen .navbar-pop { display: none; }
