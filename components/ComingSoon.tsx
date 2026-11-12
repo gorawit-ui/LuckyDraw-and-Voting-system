@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 type Props = {
-  emoji: string;
+  mascot: string;
   title: string;
   description: string;
   phase: string;
@@ -10,14 +10,15 @@ type Props = {
 };
 
 // หน้า placeholder ระหว่างพัฒนา — ชี้ไปต้นแบบเดิมที่เล่นได้แล้ว
-export default function ComingSoon({ emoji, title, description, phase, prototype, checklist = [] }: Props) {
+export default function ComingSoon({ mascot, title, description, phase, prototype, checklist = [] }: Props) {
   return (
     <main className="container py-5">
       <div className="row justify-content-center">
         <div className="col-lg-8">
           <div className="card-pop p-4 p-md-5 text-center">
-            <div style={{ fontSize: '4.5rem', filter: 'drop-shadow(3px 3px 0 var(--ink))' }}>{emoji}</div>
-            <span className="pixel-badge my-3">{phase}</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={mascot} alt="" width={720} height={720} style={{ width: 'clamp(140px, 30vw, 200px)', height: 'auto' }} />
+            <div><span className="pixel-badge my-3">{phase}</span></div>
             <h1 className="fw-bolder">{title}</h1>
             <p className="lead">{description}</p>
             {checklist.length > 0 && (

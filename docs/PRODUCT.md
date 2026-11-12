@@ -34,15 +34,15 @@
 | ~~Q3~~ | ~~Vercel demo ใช้บัญชีอะไร~~ | ✅ ตอบแล้ว → D7 | |
 | Q4 | Fashion Vote มีหลายหมวดรางวัลไหม (สวยสุด/ฮาสุด) | Phase 2 data model | 1 หมวด แต่ออกแบบ schema ให้เพิ่มได้ |
 | Q5 | วันงาน / จำนวนคน / wifi สถานที่ | ทดสอบโหลด + แผนสำรอง | 100 คน · มี hotspot สำรอง |
-| Q6 | ชื่อเว็บจริง (ตอนนี้ใช้ OUTING CHALLENGE) + มาสคอต | Branding | ใช้ชื่อชั่วคราว |
+| Q6 | ชื่อเว็บจริง (ตอนนี้ใช้ OUTING CHALLENGE) | Branding | ใช้ชื่อนี้ (มาสคอต: ✅ จี๊ด สีเขียว — ผู้ใช้ยืนยัน 2026-11-12) |
 
 ## 4. Roadmap
 | Phase | เป้าหมาย | ส่งมอบ | สถานะ |
 |---|---|---|---|
 | **0 · Foundation** | โครงเว็บ + ธีม + landing + เมนู + deploy demo | repo นี้ · หน้า landing · placeholder ทุกหน้า | ✅ โครงเสร็จ · ⏳ deploy Vercel |
-| **0.5 · Brand assets** | ได้ภาพ/มาสคอตจาก ChatGPT มาแทน emoji | `public/brand/**` ตาม `docs/CHATGPT-PROMPTS.md` | ⏳ |
+| **0.5 · Brand assets** | ได้ภาพ/มาสคอตจาก ChatGPT มาแทน emoji | `public/brand/**` ตาม `docs/CHATGPT-PROMPTS.md` | ✅ ใส่ในหน้าแรก/วงล้อ/โหวต/404 แล้ว (มาสคอตจี๊ด สีเขียว) |
 | **1 · วงล้อคู่** | พอร์ตวงล้อจากต้นแบบ (ใช้ได้ทันทีไม่ต้องมี backend) | `/lucky/wheel` | ✅ เสร็จ (รอภาพจริงจาก 0.5) |
-| **2 · Fashion Vote** | Slack login + โหวต + หลังบ้าน + จอเวที | `/vote`, `/vote/admin`, `/vote/stage` | ⏳ |
+| **2 · Fashion Vote** | Slack login + โหวต + หลังบ้าน + จอเวที | `/vote`, `/vote/admin`, `/vote/stage` | 🟡 2a เสร็จ (UI ครบ + backend จำลอง) · ⏳ 2b ต่อ Slack + Firestore |
 | **3 · กาชาปอง** | ห้อง real-time + สุ่มลูกเต๋า + หน้าตรวจผล | `/lucky/gacha`, `/lucky/gacha/stage`, `/verify` | ⏳ รอ Q1, Q2 |
 | **4 · Go-live** | ย้าย Cloud Run บริษัท + ซ้อม + load test | Dockerfile + deploy script | ⏳ |
 
@@ -57,7 +57,7 @@
 - [x] **F-3** ธีมรวมศูนย์ที่ `styles/_tokens.scss` · ปุ่ม `.btn-pop` · การ์ด `.card-pop` · `.snack-pack`
 - [x] **F-4** รองรับ `prefers-reduced-motion`
 - [ ] **F-5** Deploy Vercel preview จาก branch → ได้ URL ให้ทีมลอง
-- [ ] **F-6** ใส่ภาพจริงจาก ChatGPT แทน emoji (มาสคอต hero, ภาพการ์ด 2 โซน, OG image, favicon)
+- [x] **F-6** ใส่ภาพจริงจาก ChatGPT แทน emoji (มาสคอต hero, ภาพการ์ด 2 โซน, OG image, favicon)
 
 ### Phase 1 — วงล้อคู่
 - [x] **W-1** คนคุมเวทีแก้รายชื่อ/ของรางวัล (เก็บ localStorage) · AC: ตัดคำไทยตาม SPEC (`Intl.Segmenter`, ตัดบรรทัดสมดุล)
@@ -73,11 +73,24 @@
 - เอาช่อง URL Apps Script ออกจากหน้าเว็บ → ใช้ env `SHEET_LOGGER_URL` / `SHEET_LOGGER_SECRET`
 
 ### Phase 2 — Fashion Vote (ทำตาม `docs/handoff/costume-vote/SPEC.md`)
-- [ ] **V-1** Sign in with Slack (ตรวจ team ID)
-- [ ] **V-2** สมัครประกวด + ย่อรูป 480px → pending → host อนุมัติ
-- [ ] **V-3** โหวตผ่าน API transaction (doc id = slackId · น้ำหนัก 10/1 คิดที่ server · ผู้ประกวดโหวตไม่ได้)
-- [ ] **V-4** หลังบ้าน 4 แท็บ + CSV + รีเซ็ต
-- [ ] **V-5** จอเวที: นับคนโหวต + เวลา → reveal ทีละอันดับ (Space/→) + confetti + QR
+**2a (เสร็จ) — UI ครบทุกหน้า บน backend จำลอง** `lib/vote/mock-store.ts` (localStorage + BroadcastChannel ซิงก์ข้ามแท็บ, login จำลองแยกต่อแท็บ)
+- [x] **V-2** สมัครประกวด + ย่อรูป 480px JPEG q0.8 → pending → host อนุมัติ · ถอนใบสมัครได้ขณะ pending
+- [x] **V-3 (กฎ)** `lib/vote/logic.ts` ฟังก์ชันล้วน: เปิดอยู่+ไม่หมดเวลา · 1 คน 1 โหวต · ผู้ประกวดโหวตไม่ได้ · น้ำหนัก 10/1 คิดจากข้อมูลผู้ใช้ — **ใช้ซ้ำใน API จริงได้ทันที**
+- [x] **V-4** หลังบ้าน 4 แท็บ: ภาพรวม (stepper, ตั้งเวลา, +1 นาที, ปิด/เปิดต่อ +2, stats, ผู้ชนะ, คะแนนสด, ใครโหวตใคร, CSV, รีเซ็ต 2 แบบ, จำลองโหวต) · ผู้ประกวด · ผู้ใช้และสิทธิ์ · งานทั้งหมด
+- [x] **V-5** จอเวที: นับคนโหวต + progress + นับถอยหลัง (ไม่โชว์คะแนน) → เปิดผลทีละอันดับจากท้าย (Space/→/←, การ์ดพลิก) → ผู้ชนะ + มาสคอต + พลุ · ปิดอัตโนมัติเมื่อหมดเวลา
+- [x] ทดสอบ E2E 4 แท็บพร้อมกัน (host / จอเวที / พนักงาน / เมเนเจอร์) ผ่าน
+
+**2b (ถัดไป) — ต่อของจริง** ⚠️ ต้องมีของจาก IT/Admin ก่อน (ดูหัวข้อ "สิ่งที่ต้องเตรียม")
+- [ ] **V-1** Sign in with Slack (Auth.js + OIDC, ตรวจ team ID) แทน `SignIn` จำลอง
+- [ ] **V-3 (API)** `POST /api/vote` ใช้ `castVote()` ใน Firestore transaction · doc id = slackId
+- [ ] **V-6** แทน `mock-store.ts` ด้วย Firestore (หน้า host/จอเวที subscribe ตรง · มือถืออ่านครั้งเดียว) + Security Rules
+- [ ] **V-7** sync เมเนเจอร์จาก Slack user group · ปิดโหวตตามเวลาที่ server
+- [ ] QR บนจอเวที (ข้อเสนอ — รอผู้ใช้ยืนยัน)
+
+**สิ่งที่ต้องเตรียมสำหรับ 2b (งาน IT/Admin ของบริษัท)**
+1. Slack App: OIDC scopes `openid profile email` + bot scopes `users:read usergroups:read` + Redirect URL ของ demo/prod · บอก Team ID และชื่อ user group เมเนเจอร์
+2. GCP project: เปิด Firestore (Native mode, `asia-southeast1`) + service account สำหรับ server
+3. Demo บน Vercel ใช้ backend จำลองได้เลย (ข้อมูลตัวอย่าง ไม่มีข้อมูลจริง ตาม D7)
 
 ### Phase 3 — กาชาปอง (ทำตาม `docs/handoff/lucky-wheel-gacha/SPEC.md` §4, state บน Firestore)
 - [ ] **G-1** สแกน QR เข้าห้อง ใส่ชื่อ (เตือนชื่อซ้ำ) · host เห็น chip real-time ลบได้

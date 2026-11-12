@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { WheelEngine } from '@/lib/wheel/engine';
 import { DEFAULT_GIFTS, DEFAULT_NAMES, randInt } from '@/lib/wheel/defaults';
 import { burst, playTick, prefersReducedMotion } from '@/lib/fx';
+import { MASCOT } from '@/lib/site';
 
 type Phase = 'idle' | 'spinning' | 'name' | 'stopping' | 'done';
 type SheetState = 'sending' | 'sent' | 'local' | 'failed';
@@ -197,13 +198,18 @@ export default function WheelGame() {
     : phase === 'spinning' ? 'กำลังหมุน…'
     : phase === 'name' ? 'แตะตรงไหนก็ได้ เพื่อหยุดวงล้อของรางวัล'
     : phase === 'stopping' ? 'กำลังหน่วง…'
-    : 'ยินดีด้วย! 🎉';
+    : 'ยินดีด้วย! รางวัลนี้ของคุณ 🎉';
 
   return (
     <main className={`wheel-page container-xxl py-3 py-md-4 ${phase === 'name' ? 'is-tap-to-stop' : ''}`} onClick={onStageClick}>
       {/* ---------- หัวเรื่อง ---------- */}
       <div className="d-flex flex-wrap align-items-center gap-3 mb-3">
-        <h1 className="display-pop mb-0 me-auto" style={{ fontSize: 'clamp(2rem, 6vw, 3.2rem)' }}>🎡 วงล้อคู่</h1>
+        <h1 className="display-pop mb-0 me-auto d-flex align-items-center gap-2" style={{ fontSize: 'clamp(2rem, 6vw, 3.2rem)' }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={MASCOT(phase === 'done' ? 'winner' : phase === 'name' || phase === 'stopping' ? 'nervous' : 'wheel')} alt=""
+            width={720} height={720} className="wheel-mascot" />
+          วงล้อคู่
+        </h1>
         <span className="chip-pop" role="status" aria-live="polite">{status}</span>
         <button type="button" className="btn btn-pop btn-pop-cream btn-sm" onClick={() => { setSoundOn((s) => !s); if (!soundOn) playTick(); }}
           aria-pressed={soundOn} title="เสียงเข็ม">
@@ -248,17 +254,17 @@ export default function WheelGame() {
         {(phase === 'idle' || phase === 'spinning') && (
           <button type="button" className="btn btn-pop btn-lg wheel-cta" onClick={() => void spin()}
             disabled={phase !== 'idle' || !names.length || !gifts.length}>
-            <i className="bi bi-play-fill me-1" />{phase === 'spinning' ? 'กำลังหมุน…' : 'เริ่มหมุน'}
+            <i className="bi bi-play-fill me-1" />{phase === 'spinning' ? 'กำลังหมุน…' : 'หมุนเลย ลุ้นกัน'}
           </button>
         )}
         {(phase === 'name' || phase === 'stopping') && (
           <button type="button" className="btn btn-pop btn-pop-red btn-lg wheel-cta" onClick={() => void stopGift()} disabled={phase !== 'name'}>
-            <i className="bi bi-stop-fill me-1" />หยุดวงล้อของรางวัล
+            <i className="bi bi-stop-fill me-1" />หยุดเลย ตรงนี้แหละ
           </button>
         )}
         {phase === 'done' && (
           <button type="button" className="btn btn-pop btn-pop-green btn-lg wheel-cta" onClick={next}>
-            <i className="bi bi-check2-circle me-1" />บันทึกแล้วหมุนต่อ
+            <i className="bi bi-check2-circle me-1" />บันทึก แล้วหมุนต่อ
           </button>
         )}
       </div>
