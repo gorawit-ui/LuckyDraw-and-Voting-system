@@ -1,0 +1,55 @@
+// =============================================================
+//  Design tokens — "Spicy Snack Pack" (อ้างอิง mood จากถุงขนมที่แนบมา)
+//  แก้สีที่นี่ที่เดียว แล้วทั้ง Bootstrap + component เปลี่ยนตาม
+// =============================================================
+
+// ---- Brand palette ----
+$chili:      #E8262B; // แดงพริก — พื้นหลังหลัก (พลัง/ตื่นเต้น)
+$chili-deep: #B3121B; // แดงเข้ม — เงา/ขอบ/hover
+$mustard:    #FFD23F; // เหลืองมัสตาร์ด — หัวข้อใหญ่, CTA
+$tangerine:  #FF8A1F; // ส้ม — ไฟ, ไฮไลต์
+$jalapeno:   #3BB54A; // เขียวพริก — สำเร็จ / ป้าย
+$mint:       #3EC6A8; // มิ้นต์ — โซนโหวต
+$sky:        #5BC8F0; // ฟ้า — โซนวงล้อ
+$cocoa:      #6B3A1E; // ช็อกโกแลต — ข้อความบนพื้นเหลือง
+$cream:      #FFF6E0; // ครีม — การ์ด/พื้นอ่านง่าย
+$ink:        #1A1414; // หมึก — เส้นขอบการ์ตูน, ตัวอักษร
+
+// ---- Comic style ----
+$outline-w:   3px;
+$pop-shadow:  6px 6px 0 $ink;   // เงาแข็งแบบสติกเกอร์
+$pop-shadow-sm: 3px 3px 0 $ink;
+$radius-pop:  1.25rem;
+
+// ---- Bootstrap overrides (ต้องอยู่ก่อน import bootstrap) ----
+$primary:   $mustard;
+$secondary: $cocoa;
+$success:   $jalapeno;
+$info:      $sky;
+$warning:   $tangerine;
+$danger:    $chili;
+$light:     $cream;
+$dark:      $ink;
+
+$body-bg:    $chili;
+$body-color: $ink;
+$link-color: $ink;
+$border-color: $ink;
+$border-width: $outline-w;
+
+$font-family-sans-serif: var(--font-body), system-ui, -apple-system, "Segoe UI", sans-serif;
+$headings-font-family:   var(--font-display), var(--font-body), sans-serif;
+$headings-font-weight:   800;
+$font-size-base: 1.0625rem; // อ่านไทยง่ายขึ้นเล็กน้อย
+
+$border-radius:    .9rem;
+$border-radius-lg: $radius-pop;
+$btn-border-width: $outline-w;
+$btn-font-weight:  800;
+$btn-padding-y-lg: .85rem;
+$btn-padding-x-lg: 1.75rem;
+$card-border-width: $outline-w;
+$card-border-color: $ink;
+$navbar-padding-y: .75rem;
+$enable-shadows: false;
+$min-contrast-ratio: 3;

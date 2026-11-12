@@ -1,0 +1,136 @@
+@import "tokens";
+@import "bootstrap/scss/bootstrap";
+
+// ---------- CSS variables (ใช้ใน component / inline style) ----------
+:root {
+  --chili: #{$chili}; --chili-deep: #{$chili-deep}; --mustard: #{$mustard};
+  --tangerine: #{$tangerine}; --jalapeno: #{$jalapeno}; --mint: #{$mint};
+  --sky: #{$sky}; --cocoa: #{$cocoa}; --cream: #{$cream}; --ink: #{$ink};
+  --pop-shadow: #{$pop-shadow}; --pop-shadow-sm: #{$pop-shadow-sm};
+}
+
+// ---------- พื้นหลัง halftone แบบถุงขนม ----------
+body {
+  min-height: 100vh;
+  background-color: $chili;
+  background-image: radial-gradient(rgba($chili-deep, .55) 1.4px, transparent 1.6px);
+  background-size: 10px 10px;
+  -webkit-font-smoothing: antialiased;
+}
+
+// ---------- Typography ----------
+.display-pop {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 900;
+  line-height: .95;
+  color: $mustard;
+  letter-spacing: .01em;
+  // ตัวหนังสือขอบดำ + เงาแข็ง แบบโลโก้บนถุง
+  -webkit-text-stroke: 2px $ink;
+  paint-order: stroke fill;
+  text-shadow: 4px 5px 0 $ink;
+}
+.pixel { font-family: var(--font-pixel), monospace; letter-spacing: .04em; }
+
+// ---------- Pop card (การ์ดสติกเกอร์) ----------
+.card-pop {
+  background: $cream;
+  border: $outline-w solid $ink;
+  border-radius: $radius-pop;
+  box-shadow: $pop-shadow;
+}
+
+// ---------- ปุ่มนูนกดยุบ ----------
+.btn-pop {
+  --bs-btn-color: #{$ink};
+  --bs-btn-bg: #{$mustard};
+  --bs-btn-border-color: #{$ink};
+  --bs-btn-hover-color: #{$ink};
+  --bs-btn-hover-bg: #{lighten($mustard, 6%)};
+  --bs-btn-hover-border-color: #{$ink};
+  --bs-btn-active-bg: #{darken($mustard, 6%)};
+  --bs-btn-active-border-color: #{$ink};
+  --bs-btn-active-color: #{$ink};
+  box-shadow: $pop-shadow-sm;
+  transition: transform .08s ease, box-shadow .08s ease;
+  &:hover  { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 $ink; }
+  &:active { transform: translate(3px, 3px);  box-shadow: 0 0 0 $ink; }
+  &.btn-pop-green { --bs-btn-bg: #{$jalapeno}; --bs-btn-hover-bg: #{lighten($jalapeno, 6%)}; --bs-btn-active-bg: #{darken($jalapeno, 6%)}; --bs-btn-color: #fff; --bs-btn-hover-color: #fff; --bs-btn-active-color: #fff; }
+  &.btn-pop-cream { --bs-btn-bg: #{$cream}; --bs-btn-hover-bg: #fff; --bs-btn-active-bg: #{darken($cream, 6%)}; }
+}
+
+// ---------- ป้ายพิกเซล "START" ----------
+.pixel-badge {
+  display: inline-block;
+  font-family: var(--font-pixel), monospace;
+  font-size: .85rem;
+  padding: .55rem .9rem .45rem;
+  background: $tangerine;
+  color: $ink;
+  border: $outline-w solid $ink;
+  box-shadow: $pop-shadow-sm;
+  image-rendering: pixelated;
+}
+.blink { animation: blink 1.1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: .2; } }
+
+// ---------- Navbar ----------
+.navbar-pop {
+  background: $ink;
+  border-bottom: $outline-w solid $ink;
+  .navbar-brand { color: $mustard; }
+  .nav-link { color: $cream; font-weight: 700; border-radius: .6rem; padding-inline: .9rem !important;
+    &:hover, &.active { color: $ink; background: $mustard; } }
+  .dropdown-menu { border: $outline-w solid $ink; box-shadow: $pop-shadow-sm; background: $cream; }
+  .dropdown-item { font-weight: 600; color: $ink; &:hover, &:focus, &.active { color: $ink; background: $mustard; } }
+  .navbar-toggler { border-color: $mustard; background: $mustard; }
+}
+
+// ---------- Snack-pack card (การ์ดเลือกเกม — ล้อซองขนมมินิ) ----------
+.snack-pack {
+  position: relative;
+  display: block;
+  height: 100%;
+  text-decoration: none;
+  color: $ink;
+  border: $outline-w solid $ink;
+  border-radius: 1rem 1rem 1.5rem 1.5rem;
+  box-shadow: $pop-shadow;
+  overflow: hidden;
+  transition: transform .15s cubic-bezier(.3, 1.6, .5, 1), box-shadow .15s;
+  // ขอบหยักบนแบบซองขนม
+  &::before {
+    content: ""; position: absolute; inset: 0 0 auto 0; height: 14px; z-index: 2;
+    background: linear-gradient(-45deg, transparent 6px, $ink 6px 8px, transparent 8px) 0 0 / 14px 14px repeat-x;
+    opacity: .35;
+  }
+  &:hover, &:focus-visible { transform: translateY(-6px) rotate(-1deg); box-shadow: 10px 12px 0 $ink; color: $ink; }
+  &:active { transform: translateY(2px); box-shadow: $pop-shadow-sm; }
+  .pack-body { padding: 2rem 1.5rem 1.5rem; }
+  .pack-emoji { font-size: clamp(3.5rem, 9vw, 5.5rem); line-height: 1; filter: drop-shadow(3px 3px 0 $ink); }
+  .pack-title { font-family: var(--font-display), sans-serif; font-weight: 900; font-size: clamp(1.6rem, 4vw, 2.25rem); }
+  .pack-tag { position: absolute; top: 1.25rem; right: 1.25rem; z-index: 3; }
+  .pack-foot { border-top: $outline-w dashed rgba($ink, .5); padding: .9rem 1.5rem; font-weight: 700;
+    display: flex; justify-content: space-between; align-items: center; }
+}
+.pack-lucky { background: linear-gradient(160deg, $sky 0%, lighten($sky, 18%) 100%); }
+.pack-vote  { background: linear-gradient(160deg, $mint 0%, lighten($mint, 22%) 100%); }
+
+.chip-pop {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .25rem .7rem; font-size: .85rem; font-weight: 700;
+  background: $cream; border: 2px solid $ink; border-radius: 999px;
+}
+
+// ---------- Hero ----------
+.hero-zone { position: relative; padding-block: clamp(2.5rem, 8vw, 5rem) clamp(2rem, 5vw, 3rem); }
+.hero-floaty { position: absolute; font-size: clamp(2rem, 6vw, 3.5rem); filter: drop-shadow(3px 3px 0 $ink);
+  animation: floaty 3.2s ease-in-out infinite; pointer-events: none; user-select: none; }
+@keyframes floaty { 50% { transform: translateY(-12px) rotate(8deg); } }
+
+.text-cream { color: $cream !important; }
+.bg-ink { background: $ink !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

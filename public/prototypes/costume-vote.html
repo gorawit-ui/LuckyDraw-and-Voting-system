@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Costume Vote (Prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@400;500;600;700&family=Mitr:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F2FA; --surface:#FFFFFF; --surface-2:#ECE8F6; --ink:#231942; --muted:#6A6387;
+  --line:#DAD4EA; --accent:#D6246E; --accent-soft:#FBE3EE; --accent-ink:#FFFFFF;
+  --gold:#E3A316; --ok:#12806F; --ok-soft:#DDF3EF; --warn:#A95A06; --warn-soft:#FCEBD6;
+  --danger:#C0322B; --shadow:0 1px 0 rgba(35,25,66,.06), 0 8px 24px -12px rgba(35,25,66,.25);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#15112A; --surface:#1F1A3A; --surface-2:#2A2350; --ink:#EEEAFB; --muted:#A69FC4;
+    --line:#3A3264; --accent:#FF4F93; --accent-soft:#3D1B3A; --accent-ink:#1A0B18;
+    --gold:#F5C542; --ok:#3CC7B3; --ok-soft:#153A39; --warn:#F2A54A; --warn-soft:#3E2A14;
+    --danger:#FF6B62; --shadow:0 1px 0 rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.7);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#15112A; --surface:#1F1A3A; --surface-2:#2A2350; --ink:#EEEAFB; --muted:#A69FC4;
+  --line:#3A3264; --accent:#FF4F93; --accent-soft:#3D1B3A; --accent-ink:#1A0B18;
+  --gold:#F5C542; --ok:#3CC7B3; --ok-soft:#153A39; --warn:#F2A54A; --warn-soft:#3E2A14;
+  --danger:#FF6B62; --shadow:0 1px 0 rgba(0,0,0,.3), 0 10px 28px -14px rgba(0,0,0,.7);
+}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 'Anuphan',system-ui,-apple-system,'Segoe UI',Tahoma,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.display{font-family:'Mitr','Anuphan',system-ui,sans-serif;font-weight:500;line-height:1.25;margin:0}
+h1{font-size:clamp(1.6rem,4vw,2.25rem)} h2{font-size:1.35rem} h3{font-size:1.05rem}
+p{margin:0}
+a{color:inherit}
+img{max-width:100%}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.muted{color:var(--muted)}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 120px}
+
+/* top bar */
+.top{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px);margin-top:calc(-1 * env(safe-area-inset-top,0px))}
+.top-in{max-width:1100px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;min-width:0}
+.brand-mark{font-size:1.6rem}
+.brand b{font-family:'Mitr',sans-serif;font-weight:500;display:block;line-height:1.1}
+.brand small{display:block;color:var(--muted);font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:40vw}
+.nav{display:flex;gap:4px;margin-left:auto;overflow-x:auto}
+.nav a{text-decoration:none;padding:7px 12px;border-radius:999px;color:var(--muted);font-weight:500;white-space:nowrap}
+.nav a:hover{color:var(--ink);background:var(--surface-2)}
+.nav a.on{background:var(--ink);color:var(--bg)}
+.userchip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:4px 10px 4px 4px;border-radius:999px;cursor:pointer}
+.userchip span{font-weight:600;font-size:.9rem}
+.userchip em{font-style:normal;font-size:.75rem;color:var(--muted)}
+@media (max-width:720px){.nav{order:3;width:100%;margin-left:0}.userchip{margin-left:auto}}
+
+/* generic */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--line);background:var(--surface);padding:9px 16px;border-radius:12px;font-weight:600;cursor:pointer;text-decoration:none;min-height:42px}
+.btn:hover{border-color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 40%,var(--line))}
+.btn.ghost{background:transparent}
+.btn.sm{min-height:34px;padding:5px 11px;font-size:.88rem;border-radius:10px}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:.8rem;font-weight:600;padding:3px 10px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.s-reg{background:var(--warn-soft);color:var(--warn)}
+.s-vote{background:var(--accent-soft);color:var(--accent)}
+.s-vote::before{animation:blink 1.2s infinite}
+.s-closed{background:var(--surface-2);color:var(--muted)}
+.s-done{background:var(--ok-soft);color:var(--ok)}
+@keyframes blink{50%{opacity:.2}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
+.stack{display:grid;gap:16px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.av{border-radius:50%;object-fit:cover;flex:none;display:inline-grid;place-items:center}
+.av-e{background:hsl(var(--h) 70% 88%);line-height:1}
+.av-u{background:hsl(var(--h) 55% 45%);color:#fff;font-weight:600;font-size:.8rem}
+.field{display:grid;gap:6px}
+.field label{font-weight:600;font-size:.9rem}
+.field input,.field select,.inline input{border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:10px 12px;min-height:44px;width:100%}
+.inline{display:inline-flex;align-items:center;gap:8px;font-weight:500}
+.inline input{width:80px}
+.hint{font-size:.85rem;color:var(--muted)}
+
+/* voter */
+.hero-v{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;margin:8px 0 22px}
+.hero-v h1{margin:8px 0 4px}
+.cd{text-align:right}
+.cd small{display:block;color:var(--muted);font-size:.8rem}
+.cd b{font-family:'Mitr',sans-serif;font-weight:500;font-size:2rem;font-variant-numeric:tabular-nums;line-height:1}
+.notice{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px dashed var(--line);border-radius:18px;padding:18px;margin-bottom:20px}
+.notice .ic{font-size:1.8rem;line-height:1}
+.notice b{display:block;font-family:'Mitr',sans-serif;font-weight:500;font-size:1.1rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.card{position:relative;text-align:left;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:0;overflow:hidden;cursor:default;display:flex;flex-direction:column}
+button.card{cursor:pointer}
+button.card:hover{border-color:var(--muted)}
+.card.sel{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.card .ph{aspect-ratio:4/5;display:grid;place-items:center;background:var(--surface-2);overflow:hidden}
+.card .ph img{width:100%;height:100%;object-fit:cover}
+.card .ph span{width:100%;height:100%;display:grid;place-items:center;font-size:4rem;background:radial-gradient(circle at 50% 40%,hsl(var(--h) 80% 90%),hsl(var(--h) 55% 72%))}
+.card .meta{padding:10px 12px 12px}
+.card .meta b{display:block;font-family:'Mitr',sans-serif;font-weight:500;line-height:1.3}
+.card .meta span{display:block;font-size:.85rem;color:var(--muted);line-height:1.35}
+.card .check{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;opacity:0;transform:scale(.6);transition:.15s}
+.card.sel .check{opacity:1;transform:none}
+.votebar{position:fixed;left:0;right:0;bottom:0;z-index:15;background:var(--surface);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px))}
+.votebar-in{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:12px;justify-content:space-between}
+.votebar .btn{min-width:140px}
+
+/* ticket */
+.ticket{position:relative;display:grid;grid-template-columns:1fr 110px;max-width:560px;margin:10px auto;background:var(--surface);border-radius:20px;box-shadow:var(--shadow);overflow:hidden}
+.t-main{padding:22px}
+.t-main small{color:var(--muted);font-weight:600}
+.t-who{display:flex;gap:14px;align-items:center;margin:12px 0}
+.t-who b{display:block;font-family:'Mitr',sans-serif;font-weight:500;font-size:1.25rem}
+.t-stub{border-left:2px dashed var(--line);display:grid;place-content:center;text-align:center;background:var(--accent-soft);color:var(--accent)}
+.t-stub b{font-family:'Mitr',sans-serif;font-size:2.4rem;font-weight:600;line-height:1}
+.stamp{position:absolute;right:120px;top:18px;transform:rotate(-12deg);border:3px solid var(--ok);color:var(--ok);font-family:'Mitr',sans-serif;font-weight:600;padding:2px 10px;border-radius:8px;opacity:.85;animation:stamp .35s cubic-bezier(.2,1.6,.4,1) both}
+@keyframes stamp{from{transform:rotate(-12deg) scale(2.2);opacity:0}}
+@media (max-width:480px){.ticket{grid-template-columns:1fr 84px}.stamp{right:92px}}
+
+/* modal */
+.backdrop{position:fixed;inset:0;z-index:50;background:rgba(20,12,40,.55);display:grid;place-items:center;padding:16px}
+.modal{background:var(--surface);border-radius:22px;padding:22px;width:min(460px,100%);max-height:90vh;overflow:auto;box-shadow:var(--shadow);animation:pop .18s ease-out}
+.modal.wide{width:min(760px,100%)}
+@keyframes pop{from{transform:translateY(10px);opacity:0}}
+.modal textarea{width:100%;min-height:260px;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--line);border-radius:10px;padding:10px;background:var(--bg);color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:60;background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;font-weight:600;opacity:0;pointer-events:none;transition:.2s;max-width:90vw;text-align:center}
+.toast.on{opacity:1}
+
+/* host */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin:4px 0 20px;overflow-x:auto}
+.tabs button{border:0;background:none;padding:10px 14px;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tabs button.on{color:var(--ink);border-color:var(--accent)}
+.steps{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px;padding:0;list-style:none}
+.steps li{flex:1;min-width:120px;padding:8px 10px;border-radius:10px;background:var(--surface-2);color:var(--muted);font-size:.85rem;font-weight:600}
+.steps li i{font-style:normal;display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--line);margin-right:6px;font-size:.75rem}
+.steps li.done{color:var(--ink)}
+.steps li.done i{background:var(--ok);color:#fff}
+.steps li.now{background:var(--ink);color:var(--bg)}
+.steps li.now i{background:var(--accent);color:#fff}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+@media (max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+.stat small{color:var(--muted);font-weight:600;font-size:.85rem}
+.stat b{display:block;font-family:'Mitr',sans-serif;font-weight:500;font-size:1.8rem;line-height:1.2;font-variant-numeric:tabular-nums}
+.stat span{font-size:.8rem;color:var(--muted)}
+.two{display:grid;grid-template-columns:1.1fr 1fr;gap:16px}
+@media (max-width:860px){.two{grid-template-columns:1fr}}
+.lb{display:grid;gap:10px}
+.lb-row{display:grid;grid-template-columns:28px 40px 1fr auto;gap:10px;align-items:center}
+.lb-rank{font-family:'Mitr',sans-serif;font-weight:500;color:var(--muted);text-align:center}
+.lb-row.first .lb-rank{color:var(--gold)}
+.lb-name b{font-weight:600;display:block;line-height:1.25}
+.lb-bar{height:8px;border-radius:99px;background:var(--surface-2);margin-top:5px;overflow:hidden}
+.lb-bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .5s}
+.lb-row.first .lb-bar i{background:var(--gold)}
+.lb-score{text-align:right;font-variant-numeric:tabular-nums}
+.lb-score b{font-family:'Mitr',sans-serif;font-weight:500;font-size:1.25rem;display:block;line-height:1.1}
+.lb-score span{font-size:.75rem;color:var(--muted)}
+.tbl-wrap{overflow-x:auto;max-height:420px;overflow-y:auto;border:1px solid var(--line);border-radius:12px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{position:sticky;top:0;background:var(--surface-2);font-weight:600;font-size:.82rem;color:var(--muted)}
+.tag{font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--surface-2);color:var(--muted)}
+.tag.m{background:var(--accent-soft);color:var(--accent)}
+.tag.h{background:var(--ok-soft);color:var(--ok)}
+.tag.p{background:var(--warn-soft);color:var(--warn)}
+.winner{display:flex;gap:16px;align-items:center;padding:16px 18px;border-radius:18px;background:linear-gradient(120deg,color-mix(in srgb,var(--gold) 28%,var(--surface)),var(--surface));border:1px solid color-mix(in srgb,var(--gold) 50%,var(--line))}
+.winner b{font-family:'Mitr',sans-serif;font-weight:500;font-size:1.3rem;display:block}
+.clist{display:grid;gap:10px}
+.citem{display:grid;grid-template-columns:56px 1fr auto;gap:12px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.citem .av{border-radius:12px}
+.citem b{display:block;font-weight:600}
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:600px){.formgrid{grid-template-columns:1fr}}
+.photo-drop{display:flex;gap:12px;align-items:center}
+.photo-drop .prev{width:72px;height:90px;border-radius:12px;background:var(--surface-2);display:grid;place-items:center;overflow:hidden;flex:none;font-size:1.6rem;color:var(--muted)}
+.photo-drop .prev img{width:100%;height:100%;object-fit:cover}
+.evcard{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.evcard.active{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.switch{display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:.85rem}
+.switch input{width:18px;height:18px;accent-color:var(--accent)}
+
+/* login */
+.login{min-height:100vh;display:grid;place-items:center;padding:24px 16px}
+.login-box{width:min(520px,100%)}
+.login h1{font-size:clamp(2rem,7vw,3rem);line-height:1.1;margin:12px 0}
+.slack-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;background:#4A154B;color:#fff;border:0;border-radius:14px;padding:14px;font-weight:700;font-size:1.05rem;cursor:pointer;margin-top:22px}
+.slack-btn svg{width:22px;height:22px}
+.picker{margin-top:16px;display:grid;gap:6px;max-height:52vh;overflow:auto;padding:4px}
+.picker button{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--surface);padding:8px 10px;border-radius:12px;cursor:pointer;text-align:left}
+.picker button:hover{border-color:var(--ink)}
+.picker button span{flex:1}
+.picker button small{color:var(--muted);display:block;font-size:.78rem}
+.demo-note{margin-top:14px;font-size:.85rem;color:var(--muted);background:var(--surface-2);border-radius:12px;padding:10px 12px}
+
+/* stage */
+.stage{position:fixed;inset:0;overflow:auto;color:#FFF6E8;background:
+  radial-gradient(ellipse 60% 55% at 50% -5%,rgba(255,214,140,.38),transparent 70%),
+  radial-gradient(ellipse 80% 40% at 50% 110%,rgba(255,79,147,.18),transparent 70%),
+  #1C0C2E;padding:calc(18px + env(safe-area-inset-top,0px)) 0 calc(24px + env(safe-area-inset-bottom,0px))}
+.curtain{position:fixed;top:0;bottom:0;width:7vw;min-width:28px;background:repeating-linear-gradient(90deg,#6B0F2E 0 14px,#8E1A3E 14px 22px,#5A0B26 22px 34px);box-shadow:inset -12px 0 24px rgba(0,0,0,.45);pointer-events:none}
+.curtain.l{left:0}.curtain.r{right:0;transform:scaleX(-1)}
+.stage-in{position:relative;max-width:980px;margin:0 auto;padding:0 calc(7vw + 16px)}
+.stage-top{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px}
+.stage-top a,.stage-top button{color:rgba(255,246,232,.7);background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:6px 12px;text-decoration:none;font-size:.85rem;cursor:pointer}
+.stage h1{text-align:center;font-size:clamp(1.8rem,5vw,3.4rem);font-weight:600;letter-spacing:.01em;text-shadow:0 4px 30px rgba(255,190,90,.35)}
+.stage .sub{text-align:center;color:rgba(255,246,232,.7);margin-top:6px;font-size:1.05rem}
+.st-center{text-align:center;margin:34px 0}
+.st-big{font-family:'Mitr',sans-serif;font-weight:600;font-size:clamp(5rem,20vw,11rem);line-height:1;font-variant-numeric:tabular-nums;color:#FFD27A}
+.st-bar{height:12px;border-radius:99px;background:rgba(255,255,255,.12);max-width:520px;margin:18px auto 0;overflow:hidden}
+.st-bar i{display:block;height:100%;background:linear-gradient(90deg,#FF4F93,#FFD27A);transition:width .6s}
+.st-cd{font-family:'Mitr',sans-serif;font-size:clamp(2rem,6vw,3.2rem);margin-top:22px;font-variant-numeric:tabular-nums}
+.st-thumbs{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:28px}
+.st-thumbs div{text-align:center;width:96px;font-size:.85rem;color:rgba(255,246,232,.8)}
+.st-thumbs .av{border:3px solid rgba(255,210,122,.6)}
+.rv{display:grid;gap:10px;max-width:680px;margin:30px auto 0}
+.rv-row{display:grid;grid-template-columns:64px 64px 1fr auto;gap:14px;align-items:center;padding:10px 16px;border-radius:16px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)}
+.rv-row .rk{font-family:'Mitr',sans-serif;font-size:1.5rem;text-align:center;color:rgba(255,246,232,.6)}
+.rv-row b{font-family:'Mitr',sans-serif;font-weight:500;font-size:1.25rem;display:block;line-height:1.2}
+.rv-row small{color:rgba(255,246,232,.65)}
+.rv-row .sc{font-family:'Mitr',sans-serif;font-size:1.8rem;color:#FFD27A;font-variant-numeric:tabular-nums;text-align:right}
+.rv-row .sc small{display:block;font-size:.75rem;text-align:right}
+.rv-row.hide{border-style:dashed;background:transparent}
+.rv-row.hide .q{grid-column:2/-1;color:rgba(255,246,232,.35);font-family:'Mitr',sans-serif;font-size:1.3rem}
+.rv-row.just{animation:flip .6s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes flip{from{transform:rotateX(90deg);opacity:0}}
+.rv-row.win{grid-template-columns:64px 110px 1fr auto;padding:18px;background:linear-gradient(120deg,rgba(255,210,122,.3),rgba(255,79,147,.18));border-color:rgba(255,210,122,.7)}
+.rv-row.win .rk{color:#FFD27A;font-size:2.4rem}
+.rv-row.win b{font-size:1.9rem}
+.rv-row.win .sc{font-size:2.6rem}
+@media (max-width:600px){.rv-row,.rv-row.win{grid-template-columns:36px 48px 1fr auto;gap:10px;padding:10px}.rv-row.win .av{width:48px!important;height:48px!important}}
+.stage-ctrl{display:flex;justify-content:center;gap:10px;margin-top:28px;flex-wrap:wrap}
+.stage-ctrl .btn{background:#FFD27A;border-color:#FFD27A;color:#2B1400;font-size:1.05rem;padding:12px 22px}
+.stage-ctrl .btn.ghost{background:transparent;color:#FFF6E8;border-color:rgba(255,255,255,.3)}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:5}
+.confetti i{position:absolute;top:-20px;width:9px;height:14px;border-radius:2px;animation:fall linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.confetti{display:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal-root"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+const KEY='costume-vote-proto-v1', SKEY='costume-vote-user';
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=p=>p+Math.random().toString(36).slice(2,9);
+const app=document.getElementById('app');
+
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;}}
+function pickWeighted(items,weights,r){const tot=weights.reduce((a,b)=>a+b,0);let x=r()*tot;for(let i=0;i<items.length;i++){x-=weights[i];if(x<=0)return items[i];}return items[items.length-1];}
+
+/* ---------- seed data ---------- */
+function seed(){
+  const people=[['U01','พี่ต้น','People & Culture'],['U02','พี่แนน','Operations'],['U03','พี่บอส','Sales'],['U04','พี่เก่ง','Marketing'],['U05','พี่ปุ๋ย','Finance'],['U06','พี่โอ๊ต','R&D'],
+  ['U07','มายด์','Marketing'],['U08','ฟ้า','Sales'],['U09','เจมส์','Operations'],['U10','ปาล์ม','R&D'],['U11','แพรว','Finance'],['U12','กาย','Operations'],['U13','มิ้นท์','Marketing'],['U14','ภูมิ','Sales'],['U15','เฟิร์น','People & Culture'],
+  ['U16','ต้าร์','Production'],['U17','เบล','Production'],['U18','นัท','Production'],['U19','ไอซ์','Warehouse'],['U20','บีม','Warehouse'],['U21','น้ำ','Customer Service'],['U22','ฝน','Customer Service'],['U23','อาร์ม','IT'],['U24','โอม','IT'],
+  ['U25','จูน','Design'],['U26','แบงค์','Sales'],['U27','พลอย','Marketing'],['U28','ต่อ','Production'],['U29','แอน','Finance'],['U30','ปอ','Warehouse']];
+  const users=people.map(([id,name,dept],i)=>({id,name,dept,hue:(i*47+200)%360}));
+  const find=id=>users.find(u=>u.id===id);
+  const mkC=(slackId,title,emoji,hue,status)=>{const u=find(slackId);return{id:uid('c_'),slackId,name:u.name,team:u.dept,title,emoji,hue,photo:null,status:status||'approved',createdAt:Date.now()};};
+  const managerIds=['U01','U02','U03','U04','U05','U06'];
+  // past event with results
+  const past={id:'ev_2026ny',name:'ปาร์ตี้ปีใหม่ 2026 ประกวดชุดไทย',status:'revealed',durationMin:5,endsAt:null,createdAt:new Date('2026-01-09T19:00:00').getTime(),revealStep:4,votes:[],
+    contestants:[mkC('U08','ชุดไทยจักรพรรดิ','👑',45),mkC('U14','ขุนแผนยุคดิจิทัล','⚔️',210),mkC('U21','นางรำมาตรฐานสากล','💃',330),mkC('U29','แม่ค้าตลาดน้ำ','🛶',160)]};
+  const r=rng(2026), cs=past.contestants, cIds=cs.map(c=>c.slackId);
+  users.filter(u=>!cIds.includes(u.id)).forEach((u,i)=>{if(r()<.9){const c=pickWeighted(cs,[4,5,3,2],r);past.votes.push({id:uid('v_'),voterId:u.id,contestantId:c.id,weight:managerIds.includes(u.id)?10:1,at:past.createdAt+60000+i*9000});}});
+  past.revealStep=past.contestants.length;
+  const cur={id:'ev_outing26',name:'Outing 2026 ประกวดชุดแฟนซี',status:'registration',durationMin:5,endsAt:null,createdAt:Date.now(),revealStep:0,votes:[],
+    contestants:[mkC('U07','แม่มดรับงานด่วน','🧙‍♀️',280),mkC('U12','ไดโนเสาร์เดินสายไฟ','🦖',120),mkC('U17','นางฟ้าสายออฟฟิศ','👼',50),mkC('U23','นักบินอวกาศกล่องลัง','🧑‍🚀',200),mkC('U25','ผีเสื้อราตรี','🦋',310),mkC('U20','โจรสลัดคลังสินค้า','🏴‍☠️',20,'pending')]};
+  return{users,managerIds,hostIds:['U01','U02'],events:[cur,past],activeEventId:cur.id};
+}
+
+/* ---------- state ---------- */
+let S, memUser=null;
+const ui={hostTab:'overview',selected:null,photo:{reg:null,add:null},seenStep:null,userQuery:'',pendingRender:false};
+function load(){try{const raw=localStorage.getItem(KEY);S=raw?JSON.parse(raw):seed();}catch(e){S=seed();}if(!S||!S.events||!S.events.length)S=seed();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){toast('บันทึกไม่ได้ พื้นที่เก็บข้อมูลอาจเต็ม ลองใช้รูปขนาดเล็กลง');}}
+function getUserId(){try{return sessionStorage.getItem(SKEY)||memUser;}catch(e){return memUser;}}
+function setUserId(id){memUser=id;try{id?sessionStorage.setItem(SKEY,id):sessionStorage.removeItem(SKEY);}catch(e){}}
+const ev=()=>S.events.find(e=>e.id===S.activeEventId)||S.events[0];
+const me=()=>S.users.find(u=>u.id===getUserId());
+const userById=id=>S.users.find(u=>u.id===id);
+const isHost=()=>{const u=me();return !!u&&S.hostIds.includes(u.id);};
+const isMgr=id=>S.managerIds.includes(id);
+const weightOf=id=>isMgr(id)?10:1;
+const approved=e=>e.contestants.filter(c=>c.status==='approved');
+const contestantOf=(e,userId,status)=>e.contestants.find(c=>c.slackId===userId&&(!status||c.status===status));
+const eligible=e=>{const ids=approved(e).map(c=>c.slackId);return S.users.filter(u=>!ids.includes(u.id));};
+const myVote=e=>e.votes.find(v=>v.voterId===getUserId());
+function results(e){
+  const map={};approved(e).forEach(c=>map[c.id]={c,score:0,count:0,mgr:0});
+  e.votes.forEach(v=>{const r=map[v.contestantId];if(r){r.score+=v.weight;r.count++;if(v.weight>1)r.mgr++;}});
+  return Object.values(map).sort((a,b)=>b.score-a.score||b.count-a.count);
+}
+const STATUS={registration:{t:'เปิดรับสมัคร',c:'s-reg'},voting:{t:'กำลังโหวต',c:'s-vote'},closed:{t:'ปิดโหวตแล้ว',c:'s-closed'},revealed:{t:'ประกาศผลแล้ว',c:'s-done'}};
+const fmtT=t=>new Date(t).toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+const fmtD=t=>new Date(t).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'numeric'});
+function fmtCd(ms){if(ms==null||isNaN(ms))return'--:--';ms=Math.max(0,ms);const s=Math.ceil(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
+
+/* ---------- small renderers ---------- */
+function initials(n){const s=n.replace(/^พี่/,'');const m=s.match(/^[เแโใไ]?./);return m?m[0]:s.charAt(0);}
+const avU=(u,size)=>`<span class="av av-u" style="width:${size}px;height:${size}px;--h:${u.hue}">${esc(initials(u.name))}</span>`;
+const avC=(c,size)=>c.photo?`<img class="av" src="${c.photo}" alt="" style="width:${size}px;height:${size}px">`:`<span class="av av-e" style="width:${size}px;height:${size}px;font-size:${Math.round(size*.55)}px;--h:${c.hue}">${c.emoji}</span>`;
+const phC=c=>c.photo?`<img src="${c.photo}" alt="">`:`<span style="--h:${c.hue}">${c.emoji}</span>`;
+const pill=s=>`<span class="pill ${STATUS[s].c}">${STATUS[s].t}</span>`;
+const notice=(ic,title,body)=>`<div class="notice"><span class="ic">${ic}</span><div><b>${esc(title)}</b>${body?`<p class="muted">${body}</p>`:''}</div></div>`;
+function roleTags(id){return (S.hostIds.includes(id)?'<span class="tag h">Host</span> ':'')+(isMgr(id)?'<span class="tag m">เมเนเจอร์ 10</span>':'<span class="tag">1 คะแนน</span>');}
+
+function currentView(){const h=(location.hash||'#vote').slice(1);return ['vote','register','host','stage'].includes(h)?h:'vote';}
+
+/* ---------- login ---------- */
+function renderLogin(open){
+  const list=S.users.map(u=>`<button data-act="login" data-id="${u.id}">${avU(u,32)}<span>${esc(u.name)}<small>${esc(u.dept)}</small></span>${roleTags(u.id)}</button>`).join('');
+  return `<div class="login"><div class="login-box">
+    <span class="pill s-vote">${esc(ev().name)}</span>
+    <h1 class="display">ใครแต่งตัวปังสุด<br>เราโหวตกันเอง 🎭</h1>
+    <p class="muted">เข้าสู่ระบบด้วย Slack ของบริษัท เลือกชุดที่ชอบ 1 คน ยืนยันแล้วแก้ไม่ได้</p>
+    <button class="slack-btn" data-act="openPicker"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M5 15a2 2 0 1 1-2-2h2v2Zm1 0a2 2 0 1 1 4 0v5a2 2 0 1 1-4 0v-5Zm3-10a2 2 0 1 1 2-2v2H9Zm0 1a2 2 0 1 1 0 4H4a2 2 0 1 1 0-4h5Zm10 3a2 2 0 1 1 2 2h-2V9Zm-1 0a2 2 0 1 1-4 0V4a2 2 0 1 1 4 0v5Zm-3 10a2 2 0 1 1-2 2v-2h2Zm0-1a2 2 0 1 1 0-4h5a2 2 0 1 1 0 4h-5Z"/></svg>เข้าสู่ระบบด้วย Slack</button>
+    ${open?`<div class="demo-note">โหมดจำลอง: เลือกว่าจะเข้าเป็นใคร ของจริงจะดึงตัวตนจาก Slack อัตโนมัติ ลองเปิดอีกแท็บเป็นคนอื่นแล้วดูข้อมูลอัปเดตข้ามแท็บได้</div><div class="picker">${list}</div>`:''}
+  </div></div>`;
+}
+
+/* ---------- topbar ---------- */
+function renderTopbar(view){
+  const u=me(),e=ev();
+  const links=[['vote','โหวต'],['register','สมัครประกวด']];
+  if(isHost())links.push(['host','หลังบ้าน'],['stage','จอเวที']);
+  return `<header class="top"><div class="top-in">
+    <a class="brand" href="#vote"><span class="brand-mark">🎭</span><span><b>Costume Vote</b><small>${esc(e.name)}</small></span></a>
+    <nav class="nav">${links.map(([k,l])=>`<a href="#${k}" class="${view===k?'on':''}">${l}</a>`).join('')}</nav>
+    <button class="userchip" data-act="logout" title="เปลี่ยนผู้ใช้">${avU(u,28)}<span>${esc(u.name)}</span><em>${weightOf(u.id)} คะแนน</em></button>
+  </div></header>`;
+}
+
+/* ---------- voter ---------- */
+function renderVote(){
+  const e=ev(),u=me(),list=approved(e),w=weightOf(u.id);
+  const head=`<section class="hero-v"><div>${pill(e.status)}<h1>${esc(e.name)}</h1>
+    <p class="muted">สิทธิ์ของคุณ <b style="color:var(--ink)">${w} คะแนน</b>${w>1?' ในฐานะเมเนเจอร์':''} โหวตได้ 1 ครั้ง ยืนยันแล้วแก้ไม่ได้</p></div>
+    ${e.status==='voting'?`<div class="cd"><small>เหลือเวลาโหวต</small><b data-countdown>--:--</b></div>`:''}</section>`;
+  if(contestantOf(e,u.id,'approved'))return head+notice('🎤','คุณเป็นผู้ประกวดในรอบนี้','ผู้ประกวดอยู่บนเวทีจึงไม่มีสิทธิ์ลงคะแนน ขอให้สนุกกับโชว์');
+  const mv=myVote(e);
+  if(mv){const c=e.contestants.find(x=>x.id===mv.contestantId);return head+renderTicket(c,mv);}
+  if(e.status==='registration')return head+notice('⏳','ยังไม่เปิดโหวต','ดูรายชื่อผู้ประกวดไว้ก่อนได้ host จะเปิดโหวตหลังทุกคนเดินโชว์ครบ')+grid(list,false);
+  if(e.status!=='voting')return head+notice('🔒','ปิดโหวตแล้ว','คุณไม่ได้ลงคะแนนในรอบนี้ รอฟังประกาศผลที่หน้าเวที');
+  if(!list.length)return head+notice('🪄','ยังไม่มีผู้ประกวด','');
+  const sel=list.find(c=>c.id===ui.selected);
+  return head+grid(list,true)+`<div class="votebar"><div class="votebar-in"><div>${sel?`เลือก <b>${esc(sel.name)}</b> <span class="muted">${esc(sel.title)}</span>`:'<span class="muted">แตะเลือกชุดที่ชอบ 1 คน</span>'}</div>
+    <button class="btn primary" data-act="confirm" ${sel?'':'disabled'}>โหวต</button></div></div>`;
+}
+function grid(list,selectable){
+  return `<div class="grid">${list.map(c=>{const inner=`<div class="ph">${phC(c)}</div><div class="meta"><b>${esc(c.title)}</b><span>${esc(c.name)} ${esc(c.team)}</span></div>`;
+    return selectable?`<button class="card ${ui.selected===c.id?'sel':''}" data-act="pick" data-id="${c.id}" aria-pressed="${ui.selected===c.id}">${inner}<span class="check">✓</span></button>`:`<div class="card">${inner}</div>`;}).join('')}</div>`;
+}
+function renderTicket(c,v){
+  return `<div class="ticket"><div class="t-main"><small>บัตรลงคะแนนของคุณ</small>
+    <div class="t-who">${avC(c,64)}<div><b>${esc(c.title)}</b><span class="muted">${esc(c.name)} ${esc(c.team)}</span></div></div>
+    <p class="hint">ลงคะแนนเมื่อ ${fmtT(v.at)} ผลจะประกาศบนเวทีหลังปิดโหวต</p></div>
+    <div class="t-stub"><b>${v.weight}</b><small>คะแนน</small></div><div class="stamp">ลงคะแนนแล้ว</div></div>`;
+}
+
+/* ---------- register ---------- */
+function renderRegister(){
+  const e=ev(),u=me(),mine=contestantOf(e,u.id);
+  const head=`<section class="hero-v"><div>${pill(e.status)}<h1>สมัครประกวดชุด</h1><p class="muted">กรอกข้อมูลและแนบรูปชุด host จะอนุมัติก่อนขึ้นรายชื่อให้โหวต</p></div></section>`;
+  if(mine){
+    const st=mine.status==='approved'?'<span class="tag h">อนุมัติแล้ว</span>':'<span class="tag p">รอ host อนุมัติ</span>';
+    return head+`<div class="panel" style="max-width:560px"><div class="citem" style="border:0;padding:0">${avC(mine,56)}<div><b>${esc(mine.title)}</b><span class="muted">${esc(mine.name)} ${esc(mine.team)}</span></div>${st}</div>
+      <p class="hint" style="margin-top:12px">${mine.status==='approved'?'คุณอยู่ในรายชื่อผู้ประกวดแล้ว ช่วงโหวตคุณจะลงคะแนนไม่ได้':'ใบสมัครของคุณส่งถึง host แล้ว'}</p>
+      ${e.status==='registration'&&mine.status==='pending'?'<div class="row" style="margin-top:12px"><button class="btn danger sm" data-act="withdraw">ถอนใบสมัคร</button></div>':''}</div>`;
+  }
+  if(e.status!=='registration')return head+notice('🔒','ปิดรับสมัครแล้ว','ติดต่อ host หากต้องการเพิ่มชื่อ');
+  return head+`<form class="panel stack" data-form="register" style="max-width:640px">
+    <div class="formgrid">
+      <div class="field"><label for="r-name">ชื่อที่ให้ประกาศ</label><input id="r-name" name="name" required value="${esc(u.name)}"></div>
+      <div class="field"><label for="r-team">ทีม/แผนก</label><input id="r-team" name="team" value="${esc(u.dept)}"></div>
+    </div>
+    <div class="field"><label for="r-title">ชื่อชุดหรือคอนเซปต์</label><input id="r-title" name="title" required placeholder="เช่น แม่มดรับงานด่วน"></div>
+    ${photoField('reg')}
+    <div class="row"><button class="btn primary" type="submit">ส่งใบสมัคร</button><span class="hint">ใบสมัครผูกกับบัญชี Slack ของคุณ</span></div>
+  </form>`;
+}
+function photoField(key){
+  const p=ui.photo[key];
+  return `<div class="field"><label>รูปชุด</label><div class="photo-drop"><div class="prev" id="prev-${key}">${p?`<img src="${p}" alt="">`:'📷'}</div>
+    <div><input type="file" accept="image/*" data-act="photo" data-key="${key}" aria-label="เลือกรูปชุด"><p class="hint">ไม่มีรูปก็ได้ ระบบจะใส่ไอคอนแทน</p></div></div></div>`;
+}
+
+/* ---------- host ---------- */
+function renderHost(){
+  if(!isHost())return notice('🔐','หน้านี้สำหรับ host เท่านั้น','กดชื่อมุมขวาบนเพื่อสลับเป็นผู้ใช้ที่มีป้าย Host');
+  const tabs=[['overview','ภาพรวม'],['contestants','ผู้ประกวด'],['users','ผู้ใช้และสิทธิ์'],['events','งานทั้งหมด']];
+  const e=ev();
+  const body=ui.hostTab==='contestants'?hostContestants(e):ui.hostTab==='users'?hostUsers():ui.hostTab==='events'?hostEvents():hostOverview(e);
+  return `<section class="hero-v" style="margin-bottom:8px"><div>${pill(e.status)}<h1>${esc(e.name)}</h1></div></section>
+    <div class="tabs" role="tablist">${tabs.map(([k,l])=>`<button role="tab" class="${ui.hostTab===k?'on':''}" data-act="hostTab" data-tab="${k}">${l}${k==='contestants'&&e.contestants.some(c=>c.status==='pending')?' <span class="tag p">'+e.contestants.filter(c=>c.status==='pending').length+'</span>':''}</button>`).join('')}</div>${body}`;
+}
+function hostOverview(e){
+  const order=['registration','voting','closed','revealed'],idx=order.indexOf(e.status);
+  const steps=`<ol class="steps">${order.map((s,i)=>`<li class="${i<idx?'done':i===idx?'now':''}"><i>${i<idx?'✓':i+1}</i>${STATUS[s].t}</li>`).join('')}</ol>`;
+  const n=approved(e).length;
+  let act='';
+  if(e.status==='registration')act=`<label class="inline">เวลาโหวต <input type="number" min="1" max="120" value="${e.durationMin}" data-act="duration" aria-label="เวลาโหวตเป็นนาที"> นาที</label>
+    <button class="btn primary" data-act="openVoting" ${n?'':'disabled'}>เปิดโหวต</button>${n?'':'<span class="hint">ต้องมีผู้ประกวดที่อนุมัติแล้วอย่างน้อย 1 คน</span>'}`;
+  else if(e.status==='voting')act=`<span class="inline">เหลือ <b class="display" style="font-size:1.4rem;font-variant-numeric:tabular-nums" data-countdown>--:--</b></span>
+    <button class="btn sm" data-act="addMin">+1 นาที</button><button class="btn danger" data-act="closeVoting">ปิดโหวตตอนนี้</button>
+    <button class="btn ghost sm" data-act="simulate">🎲 จำลองให้คนที่เหลือโหวต (demo)</button>`;
+  else if(e.status==='closed')act=`<a class="btn primary" href="#stage">ไปจอเวทีเพื่อประกาศผล</a><button class="btn ghost sm" data-act="reopen">เปิดโหวตต่ออีก 2 นาที</button>`;
+  else act=`<a class="btn" href="#stage">ดูจอเวที</a><button class="btn ghost sm" data-act="resetReveal">ประกาศผลใหม่อีกรอบ</button>`;
+
+  const res=results(e),elig=eligible(e),voted=e.votes.length;
+  const mgrs=elig.filter(u=>isMgr(u.id)),mgrVoted=e.votes.filter(v=>isMgr(v.voterId)).length;
+  const total=e.votes.reduce((a,v)=>a+v.weight,0),max=Math.max(1,...res.map(r=>r.score));
+  const pct=elig.length?Math.round(voted/elig.length*100):0;
+  const win=(e.status==='closed'||e.status==='revealed')&&res[0]&&res[0].score>0?`<div class="winner">${avC(res[0].c,64)}<div><span class="muted">ผู้ชนะ</span><b>🏆 ${esc(res[0].c.title)}</b><span class="muted">${esc(res[0].c.name)} ${esc(res[0].c.team)} ได้ ${res[0].score} คะแนน จาก ${res[0].count} โหวต</span></div></div>`:'';
+  const lb=res.length?res.map((r,i)=>`<div class="lb-row ${i===0&&r.score>0?'first':''}"><span class="lb-rank">${i+1}</span>${avC(r.c,40)}
+    <div class="lb-name"><b>${esc(r.c.title)}</b><span class="hint">${esc(r.c.name)}</span><div class="lb-bar"><i style="width:${r.score/max*100}%"></i></div></div>
+    <div class="lb-score"><b>${r.score}</b><span>${r.count} โหวต${r.mgr?`, เมเนเจอร์ ${r.mgr}`:''}</span></div></div>`).join(''):'<p class="muted">ยังไม่มีผู้ประกวด</p>';
+  const log=e.votes.slice().sort((a,b)=>b.at-a.at).map(v=>{const u=userById(v.voterId)||{name:v.voterId},c=e.contestants.find(x=>x.id===v.contestantId)||{title:'(ลบแล้ว)',name:''};
+    return `<tr><td>${fmtT(v.at)}</td><td>${esc(u.name)}</td><td>${v.weight>1?'<span class="tag m">เมเนเจอร์</span>':'<span class="tag">พนักงาน</span>'}</td><td>${esc(c.title)} <span class="muted">(${esc(c.name)})</span></td><td style="text-align:right"><b>${v.weight}</b></td></tr>`;}).join('');
+  return `<div class="stack">
+    <div class="panel">${steps}<div class="row" style="justify-content:space-between"><div class="row">${act}</div><button class="btn ghost sm" data-act="resetAsk">↺ รีเซ็ต</button></div></div>
+    ${win}
+    <div class="stats">
+      <div class="stat"><small>ผู้ประกวด</small><b>${n}</b><span>${e.contestants.filter(c=>c.status==='pending').length} รออนุมัติ</span></div>
+      <div class="stat"><small>โหวตแล้ว</small><b>${voted}<span style="font-size:1rem"> / ${elig.length}</span></b><span>${pct}% ของผู้มีสิทธิ์</span></div>
+      <div class="stat"><small>เมเนเจอร์โหวตแล้ว</small><b>${mgrVoted}<span style="font-size:1rem"> / ${mgrs.length}</span></b><span>คนละ 10 คะแนน</span></div>
+      <div class="stat"><small>คะแนนรวม</small><b>${total}</b><span>ทุกคะแนนที่ลงมา</span></div>
+    </div>
+    <div class="two">
+      <div class="panel"><div class="row" style="justify-content:space-between;margin-bottom:14px"><h2>คะแนนสด</h2><span class="hint">เห็นเฉพาะ host</span></div><div class="lb">${lb}</div></div>
+      <div class="panel"><div class="row" style="justify-content:space-between;margin-bottom:14px"><h2>ใครโหวตใคร</h2><button class="btn sm" data-act="csv" ${voted?'':'disabled'}>คัดลอกผลเป็น CSV</button></div>
+        ${voted?`<div class="tbl-wrap"><table><thead><tr><th>เวลา</th><th>ผู้โหวต</th><th>บทบาท</th><th>โหวตให้</th><th style="text-align:right">คะแนน</th></tr></thead><tbody>${log}</tbody></table></div>`:'<p class="muted">ยังไม่มีใครโหวต</p>'}</div>
+    </div></div>`;
+}
+function hostContestants(e){
+  const editable=e.status==='registration';
+  const pend=e.contestants.filter(c=>c.status==='pending'),appr=approved(e);
+  const item=(c,btns)=>{const su=c.slackId&&userById(c.slackId);return `<div class="citem">${avC(c,56)}<div><b>${esc(c.title)}</b><span class="muted">${esc(c.name)} ${esc(c.team)}</span>${su?` <span class="tag">Slack: ${esc(su.name)}</span>`:' <span class="tag">ไม่ผูก Slack</span>'}</div><div class="row">${btns}</div></div>`;};
+  const dis=editable?'':'disabled title="แก้ไขรายชื่อได้เฉพาะช่วงเปิดรับสมัคร"';
+  const taken=e.contestants.map(c=>c.slackId);
+  const opts=S.users.filter(u=>!taken.includes(u.id)).map(u=>`<option value="${u.id}">${esc(u.name)} (${esc(u.dept)})</option>`).join('');
+  return `<div class="stack">
+    ${editable?'':notice('🔒','รายชื่อถูกล็อกแล้ว','แก้ไขรายชื่อผู้ประกวดได้เฉพาะช่วงเปิดรับสมัคร เพื่อไม่ให้กระทบคะแนนที่โหวตไปแล้ว')}
+    <div class="panel"><h2 style="margin-bottom:12px">รออนุมัติ (${pend.length})</h2>
+      <div class="clist">${pend.length?pend.map(c=>item(c,`<button class="btn sm primary" data-act="approve" data-id="${c.id}" ${dis}>อนุมัติ</button><button class="btn sm danger" data-act="reject" data-id="${c.id}" ${dis}>ปฏิเสธ</button>`)).join(''):'<p class="muted">ไม่มีใบสมัครค้าง</p>'}</div></div>
+    <div class="panel"><h2 style="margin-bottom:12px">ผู้ประกวด (${appr.length})</h2>
+      <div class="clist">${appr.length?appr.map(c=>item(c,`<button class="btn sm danger" data-act="removeC" data-id="${c.id}" ${dis}>ลบ</button>`)).join(''):'<p class="muted">ยังไม่มีผู้ประกวด</p>'}</div></div>
+    <form class="panel stack" data-form="add"><h2>เพิ่มผู้ประกวดเอง</h2>
+      <div class="field"><label for="a-slack">ผูกกับบัญชี Slack</label><select id="a-slack" name="slackId" data-act="pickSlack"><option value="">ไม่ผูก (เช่น ประกวดเป็นทีม)</option>${opts}</select><span class="hint">ถ้าผูก คนนั้นจะลงคะแนนไม่ได้เพราะอยู่บนเวที</span></div>
+      <div class="formgrid"><div class="field"><label for="a-name">ชื่อที่ให้ประกาศ</label><input id="a-name" name="name" required></div>
+      <div class="field"><label for="a-team">ทีม/แผนก</label><input id="a-team" name="team"></div></div>
+      <div class="field"><label for="a-title">ชื่อชุดหรือคอนเซปต์</label><input id="a-title" name="title" required></div>
+      ${photoField('add')}
+      <div class="row"><button class="btn primary" type="submit" ${dis}>เพิ่มเข้ารายชื่อ</button></div></form>
+  </div>`;
+}
+function userRows(){
+  const q=ui.userQuery.trim().toLowerCase();
+  const list=S.users.filter(u=>!q||u.name.toLowerCase().includes(q)||u.dept.toLowerCase().includes(q));
+  return list.map(u=>`<tr><td><span class="row" style="gap:8px">${avU(u,28)}${esc(u.name)}</span></td><td>${esc(u.dept)}</td><td class="muted">${u.id}</td>
+    <td><label class="switch"><input type="checkbox" data-act="toggleMgr" data-id="${u.id}" ${isMgr(u.id)?'checked':''}> 10 คะแนน</label></td>
+    <td><label class="switch"><input type="checkbox" data-act="toggleHost" data-id="${u.id}" ${S.hostIds.includes(u.id)?'checked':''}> Host</label></td></tr>`).join('')||'<tr><td colspan="5" class="muted">ไม่พบชื่อที่ค้นหา</td></tr>';
+}
+function hostUsers(){
+  return `<div class="panel stack"><div class="row" style="justify-content:space-between"><h2>ผู้ใช้และสิทธิ์</h2><span class="hint">เมเนเจอร์ ${S.managerIds.length} คน, พนักงาน ${S.users.length-S.managerIds.length} คน</span></div>
+    <p class="hint">ของจริงจะดึงรายชื่อจาก Slack workspace และ sync เมเนเจอร์จาก user group เช่น @managers คะแนนจะคิดตามสิทธิ์ ณ ตอนที่กดโหวต</p>
+    <div class="field"><input type="search" placeholder="ค้นหาชื่อหรือแผนก" value="${esc(ui.userQuery)}" data-act="userSearch" aria-label="ค้นหาผู้ใช้"></div>
+    <div class="tbl-wrap"><table><thead><tr><th>ชื่อ</th><th>แผนก</th><th>Slack ID</th><th>เมเนเจอร์</th><th>สิทธิ์</th></tr></thead><tbody id="userRows">${userRows()}</tbody></table></div></div>`;
+}
+function hostEvents(){
+  const cards=S.events.slice().sort((a,b)=>b.createdAt-a.createdAt).map(e=>{const r=results(e),w=(e.status==='closed'||e.status==='revealed')&&r[0]&&r[0].score>0?r[0]:null;const active=e.id===S.activeEventId;
+    return `<div class="evcard ${active?'active':''}"><div><div class="row" style="gap:8px">${pill(e.status)}<span class="hint">${fmtD(e.createdAt)}</span></div><h3 style="margin-top:6px">${esc(e.name)}</h3>
+      <p class="hint">ผู้ประกวด ${approved(e).length} คน, โหวต ${e.votes.length} ครั้ง${w?`, ผู้ชนะ ${esc(w.c.title)} (${esc(w.c.name)}) ${w.score} คะแนน`:''}</p></div>
+      <div class="row">${active?'<span class="tag h">กำลังใช้งาน</span>':`<button class="btn sm primary" data-act="setActive" data-id="${e.id}">เปิดดูงานนี้</button><button class="btn sm danger" data-act="delEvent" data-id="${e.id}">ลบ</button>`}</div></div>`;}).join('');
+  return `<div class="stack"><form class="panel row" data-form="newEvent"><div class="field" style="flex:1;min-width:220px"><label for="n-ev">สร้างงานใหม่</label><input id="n-ev" name="name" required placeholder="เช่น Outing 2027 ประกวดชุดธีมยุค 90"></div><button class="btn primary" type="submit" style="align-self:flex-end">สร้างงาน</button></form>
+    <div class="stack">${cards}</div>
+    <div class="row"><button class="btn ghost sm" data-act="resetDemo">ล้างข้อมูลและเริ่มตัวอย่างใหม่</button></div></div>`;
+}
+
+/* ---------- stage ---------- */
+function renderStage(){
+  const e=ev(),host=isHost(),elig=eligible(e),voted=e.votes.length,list=approved(e);
+  let body='';
+  if(e.status==='registration'){
+    body=`<p class="sub">ผู้ประกวด ${list.length} คน เตรียมตัวเดินโชว์</p>
+      <div class="st-thumbs">${list.map(c=>`<div>${avC(c,88)}<br>${esc(c.title)}</div>`).join('')}</div>
+      <p class="sub" style="margin-top:34px">เปิดเว็บนี้บนมือถือ แล้วเข้าสู่ระบบด้วย Slack เพื่อรอโหวต</p>`;
+  }else if(e.status==='voting'){
+    const pct=elig.length?Math.round(voted/elig.length*100):0;
+    body=`<div class="st-center"><p class="sub">โหวตแล้ว</p><div class="st-big">${voted}</div><p class="sub">จากผู้มีสิทธิ์ ${elig.length} คน</p>
+      <div class="st-bar"><i style="width:${pct}%"></i></div><div class="st-cd">เหลือ <span data-countdown>--:--</span></div></div>
+      <div class="st-thumbs">${list.map(c=>`<div>${avC(c,72)}<br>${esc(c.title)}</div>`).join('')}</div>`;
+  }else{
+    const res=results(e),n=res.length,step=e.revealStep||0,justIdx=(ui.seenStep!==null&&ui.seenStep!==step&&step>0)?n-step:-1;
+    ui.seenStep=step;
+    const rows=res.map((r,i)=>{const shown=i>=n-step,w=i===0;
+      if(!shown)return `<div class="rv-row hide"><span class="rk">${i+1}</span><span class="q">?</span></div>`;
+      return `<div class="rv-row ${w?'win':''} ${i===justIdx?'just':''}"><span class="rk">${w?'🏆':i+1}</span>${avC(r.c,w?110:64)}<div><b>${esc(r.c.title)}</b><small>${esc(r.c.name)} ${esc(r.c.team)}</small></div><div class="sc">${r.score}<small>${r.count} โหวต</small></div></div>`;}).join('');
+    const nextRank=n-step;
+    const ctrl=host?`<div class="stage-ctrl">${step<n?`<button class="btn" data-act="reveal">เปิดอันดับ ${nextRank}${nextRank===1?' 🏆':''}</button>`:''}${step>0?'<button class="btn ghost" data-act="unreveal">ย้อนกลับ</button>':''}${step>=n?'<button class="btn ghost" data-act="resetAsk">↺ รีเซ็ตเล่นใหม่</button>':''}</div>${step<n?'<p class="sub" style="font-size:.85rem;margin-top:10px">กด Space หรือลูกศรขวาเพื่อเปิดอันดับถัดไป</p>':''}`:'';
+    body=`<p class="sub">${step===0?`ปิดโหวตแล้ว มีผู้ลงคะแนน ${voted} คน`:step<n?'กำลังประกาศผล':'ขอแสดงความยินดีกับผู้ชนะ'}</p><div class="rv">${rows}</div>${ctrl}`;
+    if(justIdx===0)setTimeout(confetti,50);
+  }
+  return `<div class="stage"><div class="curtain l"></div><div class="curtain r"></div><div class="stage-in">
+    <div class="stage-top"><a href="#${host?'host':'vote'}">ออกจากจอเวที</a><button data-act="fullscreen">เต็มจอ</button></div>
+    <h1>${esc(e.name)}</h1>${body}</div></div>`;
+}
+function confetti(){
+  const box=document.createElement('div');box.className='confetti';
+  const cols=['#FFD27A','#FF4F93','#7CE0D3','#B79CFF','#FFFFFF'];
+  for(let i=0;i<70;i++){const p=document.createElement('i');p.style.left=Math.random()*100+'vw';p.style.background=cols[i%cols.length];p.style.animationDuration=(2.2+Math.random()*2)+'s';p.style.animationDelay=Math.random()*.8+'s';box.appendChild(p);}
+  document.body.appendChild(box);setTimeout(()=>box.remove(),5200);
+}
+
+/* ---------- main render ---------- */
+let pickerOpen=false;
+function render(){
+  const u=me();
+  if(!u){app.innerHTML=renderLogin(pickerOpen);return;}
+  const view=currentView();
+  if(view==='stage'){app.innerHTML=renderStage();}
+  else{
+    const v=(view==='host'&&!isHost())?'vote':view;
+    app.innerHTML=renderTopbar(v)+`<main class="wrap">${v==='host'?renderHost():v==='register'?renderRegister():renderVote()}</main>`;
+  }
+  updateCountdown();
+}
+function updateCountdown(){const e=ev();document.querySelectorAll('[data-countdown]').forEach(el=>el.textContent=e.status==='voting'?fmtCd(e.endsAt-Date.now()):'--:--');}
+
+/* ---------- modal / toast ---------- */
+const mroot=document.getElementById('modal-root');
+function modal(html,wide){mroot.innerHTML=`<div class="backdrop" data-act="closeModalBg"><div class="modal ${wide?'wide':''}" role="dialog" aria-modal="true">${html}</div></div>`;const b=mroot.querySelector('.modal button');if(b)b.focus();}
+function closeModal(){mroot.innerHTML='';}
+let tt;function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),2600);}
+
+/* ---------- actions ---------- */
+function commit(msg){save();render();if(msg)toast(msg);}
+function castVote(){
+  const e=ev(),u=me();
+  if(e.status!=='voting'){closeModal();return toast('ตอนนี้ไม่ได้เปิดโหวต');}
+  if(contestantOf(e,u.id,'approved')){closeModal();return toast('ผู้ประกวดลงคะแนนไม่ได้');}
+  if(myVote(e)){closeModal();return toast('คุณโหวตไปแล้ว');}
+  const c=approved(e).find(x=>x.id===ui.selected);if(!c)return;
+  e.votes.push({id:uid('v_'),voterId:u.id,contestantId:c.id,weight:weightOf(u.id),at:Date.now()});
+  ui.selected=null;closeModal();commit('บันทึกคะแนนแล้ว');
+}
+function buildCSV(e){
+  const q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+  let out='เวลา,ผู้โหวต,Slack ID,บทบาท,คะแนน,โหวตให้,ชุด\n';
+  e.votes.slice().sort((a,b)=>a.at-b.at).forEach(v=>{const u=userById(v.voterId)||{name:''},c=e.contestants.find(x=>x.id===v.contestantId)||{name:'',title:''};
+    out+=[new Date(v.at).toLocaleString('th-TH'),u.name,v.voterId,v.weight>1?'เมเนเจอร์':'พนักงาน',v.weight,c.name,c.title].map(q).join(',')+'\n';});
+  out+='\nอันดับ,ผู้ประกวด,ชุด,คะแนน,จำนวนโหวต,โหวตจากเมเนเจอร์\n';
+  results(e).forEach((r,i)=>{out+=[i+1,r.c.name,r.c.title,r.score,r.count,r.mgr].map(q).join(',')+'\n';});
+  return out;
+}
+function simulate(){
+  const e=ev(),list=approved(e);if(!list.length)return;
+  const done=e.votes.map(v=>v.voterId),pref=list.map(()=>1+Math.random()*4);let k=0;
+  eligible(e).filter(u=>!done.includes(u.id)&&u.id!==getUserId()).forEach(u=>{if(Math.random()<.85){const c=pickWeighted(list,pref,Math.random);e.votes.push({id:uid('v_'),voterId:u.id,contestantId:c.id,weight:weightOf(u.id),at:Date.now()+k*50});k++;}});
+  commit(`จำลองโหวตเพิ่ม ${k} คน`);
+}
+function readPhoto(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>{const img=new Image();img.onload=()=>{const s=Math.min(1,480/Math.max(img.width,img.height));const cv=document.createElement('canvas');cv.width=Math.round(img.width*s);cv.height=Math.round(img.height*s);cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);res(cv.toDataURL('image/jpeg',.8));};img.onerror=rej;img.src=r.result;};r.onerror=rej;r.readAsDataURL(file);});}
+const EMOJI=['🎃','🦄','🤖','🧛','🧜‍♀️','🦸','🐉','👻','🧚','🎩','🦊','🐙'];
+
+document.addEventListener('click',ev_=>{
+  const t=ev_.target.closest('[data-act]');if(!t)return;
+  const a=t.dataset.act,id=t.dataset.id,e=ev();
+  if(a==='closeModalBg'){if(ev_.target===t)closeModal();return;}
+  switch(a){
+    case 'openPicker':pickerOpen=true;render();break;
+    case 'login':setUserId(id);pickerOpen=false;ui.selected=null;if(currentView()==='host'&&!isHost())location.hash='#vote';render();toast('เข้าสู่ระบบเป็น '+userById(id).name);break;
+    case 'logout':setUserId(null);pickerOpen=true;render();break;
+    case 'pick':ui.selected=ui.selected===id?null:id;render();break;
+    case 'confirm':{const c=approved(e).find(x=>x.id===ui.selected);if(!c)return;const w=weightOf(getUserId());
+      modal(`<h2>ยืนยันโหวต</h2><div class="citem" style="margin:16px 0">${avC(c,56)}<div><b>${esc(c.title)}</b><span class="muted">${esc(c.name)} ${esc(c.team)}</span></div><b class="display" style="font-size:1.4rem;color:var(--accent)">+${w}</b></div>
+        <p class="muted">ยืนยันแล้วเปลี่ยนใจไม่ได้ คุณมีสิทธิ์โหวตครั้งเดียว</p><div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn ghost" data-act="closeModal">กลับไปเลือกใหม่</button><button class="btn primary" data-act="castVote">ยืนยันโหวต</button></div>`);break;}
+    case 'closeModal':closeModal();break;
+    case 'castVote':castVote();break;
+    case 'withdraw':{const m=contestantOf(e,getUserId());if(m){e.contestants=e.contestants.filter(c=>c!==m);commit('ถอนใบสมัครแล้ว');}break;}
+    case 'hostTab':ui.hostTab=t.dataset.tab;render();break;
+    case 'openVoting':e.status='voting';e.endsAt=Date.now()+Math.max(1,e.durationMin)*60000;e.revealStep=0;commit('เปิดโหวตแล้ว');break;
+    case 'addMin':e.endsAt+=60000;commit('เพิ่มเวลาอีก 1 นาที');break;
+    case 'closeVoting':modal(`<h2>ปิดโหวตตอนนี้?</h2><p class="muted" style="margin-top:8px">คนที่ยังไม่โหวตจะลงคะแนนไม่ได้อีก</p><div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn ghost" data-act="closeModal">ยกเลิก</button><button class="btn danger" data-act="doClose">ปิดโหวต</button></div>`);break;
+    case 'doClose':e.status='closed';e.endsAt=null;e.revealStep=0;closeModal();commit('ปิดโหวตแล้ว');break;
+    case 'reopen':e.status='voting';e.endsAt=Date.now()+120000;commit('เปิดโหวตต่ออีก 2 นาที');break;
+    case 'resetReveal':e.status='closed';e.revealStep=0;commit('รีเซ็ตการประกาศผลแล้ว');break;
+    case 'simulate':simulate();break;
+    case 'csv':modal(`<h2>ผลโหวตแบบ CSV</h2><p class="hint" style="margin:6px 0 12px">คัดลอกไปวางใน Google Sheets หรือ Excel ได้เลย</p><textarea readonly id="csvbox">${esc(buildCSV(e))}</textarea><div class="row" style="justify-content:flex-end;margin-top:12px"><button class="btn ghost" data-act="closeModal">ปิด</button><button class="btn primary" data-act="copyCsv">คัดลอก</button></div>`,true);break;
+    case 'copyCsv':{const box=document.getElementById('csvbox');box.select();let ok=false;try{ok=document.execCommand('copy');}catch(x){}
+      if(!ok&&navigator.clipboard){navigator.clipboard.writeText(box.value).then(()=>toast('คัดลอกแล้ว'),()=>toast('คัดลอกไม่ได้ ให้เลือกข้อความแล้วกดคัดลอกเอง'));}else toast(ok?'คัดลอกแล้ว':'คัดลอกไม่ได้ ให้เลือกข้อความแล้วกดคัดลอกเอง');break;}
+    case 'approve':{const c=e.contestants.find(x=>x.id===id);if(c){c.status='approved';commit('อนุมัติ '+c.name+' แล้ว');}break;}
+    case 'reject':case 'removeC':e.contestants=e.contestants.filter(x=>x.id!==id);commit(a==='reject'?'ปฏิเสธใบสมัครแล้ว':'ลบออกจากรายชื่อแล้ว');break;
+    case 'setActive':S.activeEventId=id;ui.selected=null;ui.seenStep=null;commit('เปลี่ยนไปดู '+ev().name);break;
+    case 'delEvent':{const x=S.events.find(y=>y.id===id);modal(`<h2>ลบงานนี้?</h2><p class="muted" style="margin-top:8px">${esc(x.name)} และผลโหวตทั้งหมดจะหายไป</p><div class="row" style="justify-content:flex-end;margin-top:18px"><button class="btn ghost" data-act="closeModal">ยกเลิก</button><button class="btn danger" data-act="doDelEvent" data-id="${id}">ลบงาน</button></div>`);break;}
+    case 'doDelEvent':S.events=S.events.filter(y=>y.id!==id);closeModal();commit('ลบงานแล้ว');break;
+    case 'resetAsk':modal(`<h2>รีเซ็ตเพื่อเล่นใหม่</h2><p class="muted" style="margin-top:8px">เลือกว่าจะล้างแค่ไหน</p>
+      <div class="stack" style="margin-top:16px">
+        <button class="btn" style="justify-content:flex-start;text-align:left;height:auto;padding:12px 14px" data-act="resetVotes"><span><b>ล้างคะแนนรอบนี้</b><br><span class="hint">เก็บรายชื่อผู้ประกวดไว้ ลบคะแนนทั้งหมด แล้วกลับไปช่วงเปิดรับสมัคร</span></span></button>
+        <button class="btn danger" style="justify-content:flex-start;text-align:left;height:auto;padding:12px 14px" data-act="resetDemo"><span><b>ล้างทั้งหมด</b><br><span class="hint">กลับไปเป็นข้อมูลตัวอย่างตั้งต้น ทุกงาน ผู้ประกวด และสิทธิ์ผู้ใช้</span></span></button>
+      </div><div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn ghost" data-act="closeModal">ยกเลิก</button></div>`);break;
+    case 'resetVotes':e.votes=[];e.status='registration';e.endsAt=null;e.revealStep=0;ui.selected=null;ui.seenStep=null;closeModal();commit('ล้างคะแนนแล้ว กลับไปช่วงเปิดรับสมัคร');break;
+    case 'resetDemo':closeModal();S=seed();ui.selected=null;ui.seenStep=null;commit('เริ่มข้อมูลตัวอย่างใหม่แล้ว');break;
+    case 'reveal':{const n=results(e).length;if((e.revealStep||0)<n){e.revealStep=(e.revealStep||0)+1;if(e.revealStep>=n)e.status='revealed';commit();}break;}
+    case 'unreveal':if(e.revealStep>0){e.revealStep--;e.status='closed';ui.seenStep=e.revealStep;commit();}break;
+    case 'fullscreen':try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}catch(x){toast('เบราว์เซอร์นี้เปิดเต็มจอไม่ได้ ลองกด F11');}break;
+  }
+});
+document.addEventListener('change',x=>{
+  const t=x.target,a=t.dataset&&t.dataset.act;if(!a)return;const e=ev();
+  if(a==='duration'){e.durationMin=Math.max(1,Math.min(120,parseInt(t.value)||5));save();}
+  if(a==='toggleMgr'){const id=t.dataset.id;S.managerIds=t.checked?[...new Set([...S.managerIds,id])]:S.managerIds.filter(y=>y!==id);save();toast(userById(id).name+(t.checked?' ได้ 10 คะแนน':' ได้ 1 คะแนน'));}
+  if(a==='toggleHost'){const id=t.dataset.id;if(!t.checked&&S.hostIds.length===1){t.checked=true;return toast('ต้องมี host อย่างน้อย 1 คน');}
+    S.hostIds=t.checked?[...new Set([...S.hostIds,id])]:S.hostIds.filter(y=>y!==id);save();if(id===getUserId()&&!t.checked){location.hash='#vote';render();}toast('อัปเดตสิทธิ์ host แล้ว');}
+  if(a==='pickSlack'){const u=userById(t.value),f=t.form;if(u){f.name.value=u.name;f.team.value=u.dept;}}
+  if(a==='photo'&&t.files&&t.files[0]){const key=t.dataset.key;readPhoto(t.files[0]).then(d=>{ui.photo[key]=d;const p=document.getElementById('prev-'+key);if(p)p.innerHTML=`<img src="${d}" alt="">`;}).catch(()=>toast('อ่านรูปไม่ได้ ลองไฟล์ JPG หรือ PNG'));}
+});
+document.addEventListener('input',x=>{const t=x.target;if(t.dataset&&t.dataset.act==='userSearch'){ui.userQuery=t.value;const b=document.getElementById('userRows');if(b)b.innerHTML=userRows();}});
+document.addEventListener('submit',x=>{
+  const f=x.target,kind=f.dataset.form;if(!kind)return;x.preventDefault();const e=ev(),d=new FormData(f);
+  if(kind==='register'||kind==='add'){
+    if(e.status!=='registration')return toast('ปิดรับสมัครแล้ว');
+    const key=kind==='register'?'reg':'add',slackId=kind==='register'?getUserId():(d.get('slackId')||null);
+    if(slackId&&contestantOf(e,slackId))return toast('คนนี้อยู่ในรายชื่อแล้ว');
+    e.contestants.push({id:uid('c_'),slackId,name:String(d.get('name')).trim(),team:String(d.get('team')||'').trim(),title:String(d.get('title')).trim(),emoji:EMOJI[Math.floor(Math.random()*EMOJI.length)],hue:Math.floor(Math.random()*360),photo:ui.photo[key],status:kind==='register'?'pending':'approved',createdAt:Date.now()});
+    ui.photo[key]=null;commit(kind==='register'?'ส่งใบสมัครแล้ว รอ host อนุมัติ':'เพิ่มผู้ประกวดแล้ว');
+  }
+  if(kind==='newEvent'){const ne={id:uid('ev_'),name:String(d.get('name')).trim(),status:'registration',durationMin:5,endsAt:null,createdAt:Date.now(),revealStep:0,votes:[],contestants:[]};S.events.push(ne);S.activeEventId=ne.id;ui.seenStep=null;commit('สร้างงานใหม่แล้ว เพิ่มผู้ประกวดได้เลย');}
+});
+document.addEventListener('keydown',x=>{
+  if(x.key==='Escape'&&mroot.innerHTML)closeModal();
+  if(currentView()==='stage'&&isHost()&&(x.key===' '||x.key==='ArrowRight')&&!mroot.innerHTML){const b=document.querySelector('[data-act="reveal"]');if(b){x.preventDefault();b.click();}}
+});
+window.addEventListener('hashchange',()=>{closeModal();render();window.scrollTo(0,0);});
+window.addEventListener('storage',x=>{if(x.key!==KEY)return;load();const a=document.activeElement;if(a&&a.closest&&a.closest('form')){ui.pendingRender=true;return;}render();});
+document.addEventListener('focusout',()=>{if(ui.pendingRender){setTimeout(()=>{const a=document.activeElement;if(!(a&&a.closest&&a.closest('form'))){ui.pendingRender=false;render();}},0);}});
+setInterval(()=>{const e=ev();if(!e)return;if(e.status==='voting'&&e.endsAt&&Date.now()>=e.endsAt){e.status='closed';e.endsAt=null;e.revealStep=0;save();render();toast('หมดเวลา ปิดโหวตอัตโนมัติ');return;}updateCountdown();},500);
+
+load();render();
+})();
+</script>
+</body>
+</html>

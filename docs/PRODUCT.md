@@ -1,0 +1,90 @@
+# PRODUCT — Outing Challenge (มุมมอง PO)
+
+> เอกสารนี้คือ "ความจริงล่าสุด" ของโปรเจกต์ — ถ้าขัดกับ `docs/handoff/*` ให้ยึดไฟล์นี้
+
+## 1. Vision
+เว็บเดียวสำหรับวันเอาท์ติ้ง เปิดจากมือถือ/โน้ตบุ๊ก/จอเวทีได้หมด รวม 2 โมดูล
+| โมดูล | เกม | ใครใช้ |
+|---|---|---|
+| **Lucky Zone** | วงล้อคู่ (ชื่อ ↔ ของรางวัล) · ตู้กาชาปองจับคู่แลกของขวัญ | คนคุมเวที + พนักงานทุกคน |
+| **Fashion Vote** | โหวตประกวดชุดตอน Fashion Walk | พนักงานทุกคน (มือถือ) + host + จอเวที |
+
+**Success metrics วันงาน**
+- คนโหวตได้ภายใน 30 วินาทีหลังสแกน QR (ไม่ต้องถามใคร)
+- 0 ข้อร้องเรียนเรื่อง "ระบบล็อกผล"
+- รองรับ 100 คนพร้อมกันโดยไม่ค้าง · ผลทุกเกมเก็บลงชีท/CSV ได้ครบ
+
+## 2. Decisions (ตัดสินใจแล้วใน Phase 0)
+| # | เรื่อง | ตัดสินใจ | เหตุผล |
+|---|---|---|---|
+| D1 | Framework | **Next.js (App Router, TypeScript)** ทั้งเว็บ | Costume Vote เลือกไว้แล้ว · deploy ได้ทั้ง Vercel และ Cloud Run (`output: 'standalone'`) |
+| D2 | UI | **Bootstrap 5.3 + SCSS theme** (`styles/_tokens.scss`) + Bootstrap Icons | grid/responsive/modal/navbar พร้อมใช้ ทำงานเหมือนกันบน macOS/Windows/มือถือ |
+| D3 | Real-time + state | **Firestore** ทั้ง 2 โมดูล (รวมห้องกาชาปอง) | Vercel เป็น serverless เก็บห้องใน memory / ถือ SSE นานๆ ไม่ได้ · Cloud Run scale-to-zero ได้ บิล ≈ 0 |
+| D4 | วงล้อคู่ | client-only (Canvas) ไม่ต้องมี backend · พอร์ตตรรกะจากต้นแบบเดิมทั้งหมด | ต้นแบบผ่านการอนุมัติแล้ว (ดู "สิ่งที่ห้ามใส่กลับ" ใน handoff) |
+| D5 | สุ่มกาชาปอง | `lib/fair-draw.ts` ใช้ร่วม server + หน้าตรวจผล | โปร่งใส ตรวจซ้ำได้ |
+| D6 | ธีม | **Spicy Snack Pack** (ดู `docs/DESIGN.md`) แทนธีม Matchazuki/ม่วงเดิม | ตาม mood ใหม่: สนุก มีพลัง สีสด |
+| D7 | Hosting | Vercel (demo) → Cloud Run บริษัท (จริง) | ดู `docs/DEPLOY.md` และข้อควรระวังเรื่องแพลนฟรี Vercel |
+
+## 3. ❓ Open questions (ต้องตอบก่อนเริ่ม phase ที่เกี่ยว)
+| # | คำถาม | กระทบ | ค่าเริ่มต้นถ้ายังไม่ตอบ |
+|---|---|---|---|
+| Q1 | กาชาปองแลกของ **เปิดเผย** หรือ **ลับ (Secret Santa)**? | Phase 3 จอเวที/หน้าตรวจผล | เปิดเผย |
+| Q2 | ใช้ **Slack login** กับกาชาปองด้วยไหม (แก้ชื่อซ้ำ) หรือพิมพ์ชื่อเอง? | Phase 3 | พิมพ์ชื่อ + ตรวจชื่อซ้ำ |
+| Q3 | Vercel demo ใช้บัญชีอะไร (Hobby ห้ามใช้เชิงพาณิชย์) | Phase 0 deploy | ดู DEPLOY.md |
+| Q4 | Fashion Vote มีหลายหมวดรางวัลไหม (สวยสุด/ฮาสุด) | Phase 2 data model | 1 หมวด แต่ออกแบบ schema ให้เพิ่มได้ |
+| Q5 | วันงาน / จำนวนคน / wifi สถานที่ | ทดสอบโหลด + แผนสำรอง | 100 คน · มี hotspot สำรอง |
+| Q6 | ชื่อเว็บจริง (ตอนนี้ใช้ OUTING CHALLENGE) + มาสคอต | Branding | ใช้ชื่อชั่วคราว |
+
+## 4. Roadmap
+| Phase | เป้าหมาย | ส่งมอบ | สถานะ |
+|---|---|---|---|
+| **0 · Foundation** | โครงเว็บ + ธีม + landing + เมนู + deploy demo | repo นี้ · หน้า landing · placeholder ทุกหน้า | ✅ โครงเสร็จ · ⏳ deploy Vercel |
+| **0.5 · Brand assets** | ได้ภาพ/มาสคอตจาก ChatGPT มาแทน emoji | `public/brand/**` ตาม `docs/CHATGPT-PROMPTS.md` | ⏳ |
+| **1 · วงล้อคู่** | พอร์ตวงล้อจากต้นแบบ (ใช้ได้ทันทีไม่ต้องมี backend) | `/lucky/wheel` | ⏳ |
+| **2 · Fashion Vote** | Slack login + โหวต + หลังบ้าน + จอเวที | `/vote`, `/vote/admin`, `/vote/stage` | ⏳ |
+| **3 · กาชาปอง** | ห้อง real-time + สุ่มลูกเต๋า + หน้าตรวจผล | `/lucky/gacha`, `/lucky/gacha/stage`, `/verify` | ⏳ รอ Q1, Q2 |
+| **4 · Go-live** | ย้าย Cloud Run บริษัท + ซ้อม + load test | Dockerfile + deploy script | ⏳ |
+
+> ลำดับ 1 ก่อน 2: วงล้อไม่ต้องมี backend จึงได้ของเล่นได้จริงเร็วสุด ระหว่างนั้นขอ Slack App/GCP ไปพร้อมกัน
+
+## 5. Backlog (User stories + Acceptance criteria)
+
+### Phase 0 — Foundation
+- [x] **F-1** ในฐานะพนักงาน ฉันเปิดหน้าแรกแล้วเห็น 2 โซนชัดเจน กดเข้าได้ในแตะเดียว
+  - AC: การ์ดซองขนม 2 ใบ · ลิงก์ย่อยใต้การ์ด · มือถือ 390px ไม่มี scroll แนวนอน
+- [x] **F-2** เมนูบาร์ทุกหน้า มี dropdown เข้าแต่ละหน้าย่อย (มือถือเป็น hamburger)
+- [x] **F-3** ธีมรวมศูนย์ที่ `styles/_tokens.scss` · ปุ่ม `.btn-pop` · การ์ด `.card-pop` · `.snack-pack`
+- [x] **F-4** รองรับ `prefers-reduced-motion`
+- [ ] **F-5** Deploy Vercel preview จาก branch → ได้ URL ให้ทีมลอง
+- [ ] **F-6** ใส่ภาพจริงจาก ChatGPT แทน emoji (มาสคอต hero, ภาพการ์ด 2 โซน, OG image, favicon)
+
+### Phase 1 — วงล้อคู่
+- [ ] **W-1** คนคุมเวทีแก้รายชื่อ/ของรางวัล (เก็บ localStorage) · AC: ตัดคำไทยตาม SPEC (`Intl.Segmenter`, ตัดบรรทัดสมดุล)
+- [ ] **W-2** กด "เริ่มหมุน" → วงซ้ายหยุด → วงขวาหมุนค้าง → แตะตรงไหนก็ได้เพื่อหยุด · AC: สุ่ม ณ ตอนกดหยุด · หยุดแล้วไม่เด้ง/ไม่ไหล
+- [ ] **W-3** "บันทึกแล้วหมุนต่อ" → ตัดออกจากวง + log + CSV + ส่งชีท (ผ่าน API route ไม่ฝัง secret ในหน้าเว็บ) + retry
+- [ ] **W-4** เสียงติ๊ก + พลุ (เปิด/ปิดเสียงได้) · โหมดเต็มจอสำหรับโปรเจกเตอร์
+
+### Phase 2 — Fashion Vote (ทำตาม `docs/handoff/costume-vote/SPEC.md`)
+- [ ] **V-1** Sign in with Slack (ตรวจ team ID)
+- [ ] **V-2** สมัครประกวด + ย่อรูป 480px → pending → host อนุมัติ
+- [ ] **V-3** โหวตผ่าน API transaction (doc id = slackId · น้ำหนัก 10/1 คิดที่ server · ผู้ประกวดโหวตไม่ได้)
+- [ ] **V-4** หลังบ้าน 4 แท็บ + CSV + รีเซ็ต
+- [ ] **V-5** จอเวที: นับคนโหวต + เวลา → reveal ทีละอันดับ (Space/→) + confetti + QR
+
+### Phase 3 — กาชาปอง (ทำตาม `docs/handoff/lucky-wheel-gacha/SPEC.md` §4, state บน Firestore)
+- [ ] **G-1** สแกน QR เข้าห้อง ใส่ชื่อ (เตือนชื่อซ้ำ) · host เห็น chip real-time ลบได้
+- [ ] **G-2** ล็อกห้องต่อหน้าทุกคน → กรอกเลขลูกเต๋า → สุ่มที่ server ครั้งเดียว (`lib/fair-draw.ts`)
+- [ ] **G-3** ทุกเครื่อง (รวม host) เล่นแอนิเมชันพร้อมกันแล้วเปิดผล · **ห้ามมีตารางผลบนหน้า host ก่อน**
+- [ ] **G-4** จอเวทีตรวจกติกา 3 ข้อ ✓ + QR ไป `/verify` · ส่งผลลงชีททีเดียวจาก server
+
+### Phase 4 — Go-live
+- [ ] **L-1** Dockerfile + `scripts/deploy-cloudrun.sh` (min=0, request-based billing, budget alert)
+- [ ] **L-2** Firestore Security Rules + Secret Manager
+- [ ] **L-3** Load test 100 แท็บ · ทดสอบ Safari iOS / Chrome Android / Edge Windows / Safari macOS
+- [ ] **L-4** ซ้อมจริงกับผู้ใหญ่ที่กังวลเรื่องความโปร่งใส · เตรียม hotspot สำรอง
+
+## 6. Definition of Done (ทุก story)
+- ใช้ได้บน Chrome/Edge (Windows), Safari/Chrome (macOS), Safari iOS, Chrome Android
+- มือถือ 360px ไม่มี scroll แนวนอน · ปุ่มแตะได้ ≥ 44px
+- ข้อความไทยทั้งหมด · `npm run build` + `npm run typecheck` ผ่าน
+- ไม่ฝัง secret ในโค้ดฝั่งเบราว์เซอร์
