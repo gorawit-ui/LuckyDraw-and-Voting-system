@@ -23,7 +23,7 @@ export function seedState(): VoteState {
   });
   const now = Date.now();
   const current: VoteEvent = {
-    id: 'ev_main', name: 'Fashion Walk 2026', status: 'registration', durationMin: 5, endsAt: null, revealStep: 0, createdAt: now,
+    id: 'ev_main', name: 'Fashion Walk', status: 'registration', durationMin: 5, endsAt: null, revealStep: 0, createdAt: now,
     contestants: [
       mk('U07', 'นางฟ้าพริกเผา', '🌶️', 0), mk('U16', 'อัศวินกล่องลัง', '📦', 30), mk('U25', 'ราชินีมัทฉะ', '🍵', 120),
       mk('U12', 'ซูเปอร์ฮีโร่ไลน์ผลิต', '🦸', 210), mk('U21', 'ดิสโก้ยุค 80', '🪩', 280), mk('U23', 'แฮกเกอร์สายมู', '🧿', 250),
@@ -34,7 +34,7 @@ export function seedState(): VoteState {
   // งานเก่าพร้อมผล (ตัวอย่างหน้า "งานทั้งหมด")
   const pastC = [mk('U13', 'ชุดไทยประยุกต์', '👘', 330), mk('U27', 'ชุดไทยจักรี', '👑', 45), mk('U18', 'ชุดไทยเรือนต้น', '🌸', 300)];
   const past: VoteEvent = {
-    id: 'ev_ny2026', name: 'ปาร์ตี้ปีใหม่ 2026 · ประกวดชุดไทย', status: 'revealed', durationMin: 5, endsAt: null, revealStep: 3,
+    id: 'ev_thai', name: 'ประกวดชุดไทย', status: 'revealed', durationMin: 5, endsAt: null, revealStep: 3,
     createdAt: now - 1000 * 60 * 60 * 24 * 300, contestants: pastC,
     votes: users.filter((x) => !['U13', 'U27', 'U18'].includes(x.id)).map((x, i) => ({
       voterId: x.id, contestantId: pastC[(i * 7) % 3].id, weight: x.isManager ? 10 : 1, at: now - 1000 * 60 * 60 * 24 * 300 + i * 1000,

@@ -12,7 +12,7 @@
 | 4 กาชาปอง | ตู้ + แคปซูล 3 สถานะ | ตู้ 1 + sprite 3 ช่อง | ✅ ตัดแยกเป็น 4 ไฟล์ | `public/brand/stickers/gacha-machine.webp`, `capsule-{closed,crack,open}.webp` |
 | 5 สติกเกอร์ ×8 | chili, flame, star, crown, trophy, gift, dice, camera | ได้ 2 แผ่น (เนื้อหาเหมือนกัน) | ✅ ใช้แผ่น 1536×768 ตัดเป็น 8 ไฟล์ · แผ่น 1774×887 ซ้ำ ไม่ได้ใช้ | `public/brand/stickers/*.webp` |
 | 6 พื้นหลังเวที | stage-vote, stage-lucky (1920×1080) | ครบ 2 | ✅ กลางจอมืดและโล่ง ตัวเลขใหญ่อ่านง่าย | `public/brand/backgrounds/*.webp` |
-| 7 โลโก้ | OUTING CHALLENGE | 1600×800 โปร่งใส | 🔁 **ต้องทำใหม่** — เปลี่ยนชื่อเป็น PARTY CHALLENGE (2026-11-13) · ลบออกจากเว็บแล้ว ใช้ตัวหนังสือ CSS ชั่วคราว | รอ `public/brand/logo.webp` ใหม่ |
+| 7 โลโก้ | OUTING CHALLENGE | 1600×800 โปร่งใส | 🔁 **ต้องทำใหม่** — เปลี่ยนชื่อเป็น PARTY CHALLENGE (2026-11-13) · ลบออกจากเว็บแล้ว ใช้ตัวหนังสือ CSS ชั่วคราว | รอ `public/brand/logo.webp` ใหม่ · 2026-11-13 ตรวจ Drive แล้วไฟล์ยังเป็น OUTING (ขนาดเท่าเดิม) |
 | 8 OG + icon | og 1200×630, icon 512 | ครบ | ✅ ฝั่งซ้ายโล่งสำหรับข้อความ · ไอคอนอ่านออกที่ 32px (16px เห็นแค่วงกลมเขียว-เหลือง) | `app/opengraph-image.jpg`, `app/icon.png`, `app/apple-icon.png` |
 | 9 ข้อความ | `docs/copy.md` | ✅ | เนื้อหาเดียวกับที่ใส่ใน repo แล้ว | `docs/copy.md` |
 | 10 โปสเตอร์ QR | A4 2480×3508 | ✅ ช่องครีมกลางว่างสำหรับ QR | ไม่ใส่ใน repo (4.3 MB, ใช้พิมพ์) — ใส่ QR + ข้อความด้วย Canva ก่อนพิมพ์ |

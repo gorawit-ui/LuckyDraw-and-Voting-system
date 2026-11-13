@@ -334,7 +334,7 @@ function Events({ state, run }: { state: VoteState; run: (r: Result) => void }) 
       <div className="col-lg-4">
         <form className="card-pop p-3 p-md-4" onSubmit={(x) => { x.preventDefault(); const r = voteApi.createEvent(name); run(r); if (r.ok) setName(''); }}>
           <h2 className="h5"><i className="bi bi-calendar-plus me-2" />สร้างงานใหม่</h2>
-          <input className="form-control mb-2" placeholder="เช่น ปาร์ตี้ปีใหม่ 2027" value={name} onChange={(x) => setName(x.target.value)} required />
+          <input className="form-control mb-2" placeholder="เช่น ประกวดชุดไทย" value={name} onChange={(x) => setName(x.target.value)} required />
           <button type="submit" className="btn btn-pop w-100">สร้างและใช้งาน</button>
         </form>
         <button type="button" className="btn btn-sm btn-link text-cream mt-2" onClick={() => { if (confirm('ล้างข้อมูล demo ทั้งหมดกลับเป็นตัวอย่าง?')) voteApi.factoryReset(); }}>
