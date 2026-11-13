@@ -12,11 +12,29 @@ Handoff เดิม (`costume-vote/SPEC.md` §3) **เคยตัด Vercel �
 
 โค้ดออกแบบให้ deploy ได้ทั้ง 2 ที่โดยไม่ต้องแก้ (`output: 'standalone'` + state อยู่ใน Firestore ไม่ใช่ memory)
 
-## A. Vercel
-1. vercel.com → Add New Project → Import repo `LuckyDraw-and-Voting-system`
-2. Framework: Next.js (ตรวจเจออัตโนมัติ) · Build: `npm run build` · Node 20+
-3. Environment Variables: ใส่ตาม `.env.example` (Phase 0 ยังไม่ต้องใส่อะไร)
-4. ทุก push เข้า branch → ได้ Preview URL อัตโนมัติ
+## A. Vercel (demo — ทำเองจากเบราว์เซอร์ ~5 นาที)
+> Claude ใน session นี้ deploy ให้ไม่ได้: ต่อ `api.vercel.com` ไม่ได้ (network policy) และไม่มี Vercel token
+
+**ก่อนเริ่ม:** มีบัญชี Vercel (สมัครด้วย GitHub ได้) และบัญชี GitHub นั้นต้องเข้าถึง repo `gorawit-ui/LuckyDraw-and-Voting-system` ได้
+
+1. เข้า https://vercel.com → **Log in with GitHub**
+2. กด **Add New… → Project**
+3. ในหัวข้อ *Import Git Repository* หา `LuckyDraw-and-Voting-system` → กด **Import**
+   - ถ้าไม่เห็น repo: กด *Adjust GitHub App Permissions* → เลือก repo นี้ → Save แล้วกลับมาหน้าเดิม
+4. หน้า *Configure Project* — ปล่อยค่าตามนี้
+   - Project Name: เช่น `party-challenge-demo` (จะได้ลิงก์ `party-challenge-demo.vercel.app`)
+   - Framework Preset: **Next.js** (ตรวจเจอเอง)
+   - Root Directory: `./` · Build/Output/Install: ค่าเริ่มต้น
+   - **Environment Variables: ไม่ต้องใส่** (เดโมใช้ข้อมูลตัวอย่าง ห้ามใส่ค่า Slack/Sheet จริง ตาม D7)
+5. กด **Deploy** → รอ ~1–2 นาที → ได้ลิงก์ `https://<project>.vercel.app`
+6. ลองเปิด: `/` · `/lucky/wheel` · `/lucky/gacha/host` · `/vote/admin` แล้วส่งลิงก์ให้ทีม
+7. **จบเดโมแล้วลบ:** Project → **Settings → General** → เลื่อนล่างสุด **Delete Project**
+
+**หมายเหตุ**
+- branch ที่ deploy = branch หลักของ repo (ตอนนี้คือ `claude/lucid-ride-0x80b4` เพราะเป็น branch เดียว) ทุก push ใหม่จะ deploy อัตโนมัติ
+- ถ้าภายหลังมี `main` แล้วอยากเดโม branch อื่น: Settings → Git → Production Branch หรือเปิดลิงก์ Preview ของ branch นั้นในแท็บ Deployments
+- ข้อมูลเกมเก็บในเบราว์เซอร์ของแต่ละคน (ระบบจำลอง) — เปิดหลายแท็บเป็นคนละคนได้ แต่มือถือหลายเครื่องยังไม่เห็นข้อมูลเดียวกันจนกว่าจะขึ้น Google Cloud
+- ถ้า build ไม่ผ่าน: ดู log ในแท็บ Deployments → ตรวจ Node.js Version ใน Settings → General เป็น 20.x ขึ้นไป
 
 ## B. Cloud Run (ตัวจริง)
 ```bash
