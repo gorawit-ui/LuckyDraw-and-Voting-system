@@ -28,8 +28,14 @@ export default function Home() {
             <div className="col-12 col-lg-7 text-center text-lg-start order-2 order-lg-1">
               <span className="pixel-badge mb-3"><span className="blink">▶</span> PRESS START</span>
               <h1 className="mb-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/brand/logo.webp" alt={site.name} className="hero-logo" width={1200} height={520} />
+                {site.logo
+                  // eslint-disable-next-line @next/next/no-img-element
+                  ? <img src={site.logo} alt={site.name} className="hero-logo" width={1200} height={520} />
+                  : <span className="display-pop d-inline-block position-relative" style={{ fontSize: 'clamp(2.8rem, 9vw, 6.2rem)' }}>
+                      {site.nameLines.map((l, i) => <span key={l}>{i > 0 && <br />}{l}</span>)}
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={STICKER('flame')} alt="" aria-hidden className="hero-logo-flame" width={256} height={256} />
+                    </span>}
               </h1>
               <div className="d-inline-flex flex-wrap gap-2 justify-content-center mb-3">
                 <span className="chip-pop" style={{ background: 'var(--jalapeno)', color: '#fff' }}>3 เกม</span>
@@ -95,7 +101,7 @@ export default function Home() {
       </section>
 
       <footer className="container py-4 text-center text-cream small fw-semibold">
-        TDFB · Outing Challenge · ทำด้วย 💚 โดยน้องจี๊ด
+        {site.name} · ทำด้วย 💚 โดยน้องจี๊ด
       </footer>
     </main>
   );

@@ -1,6 +1,6 @@
-# 🌶️ Outing Challenge
+# 🌶️ Party Challenge
 
-เว็บรวมเกมวันเอาท์ติ้ง — **Lucky Zone** (วงล้อคู่ · ตู้กาชาปอง) + **Fashion Vote** (โหวตประกวดชุด)
+เว็บรวมเกมสำหรับงานกิจกรรม ใช้ซ้ำได้ทุกงาน — **Lucky Zone** (วงล้อคู่ · ตู้กาชาปอง) + **Fashion Vote** (โหวตประกวดชุด)
 
 ```bash
 npm install

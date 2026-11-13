@@ -203,7 +203,7 @@ details.settings summary{cursor:pointer;font-weight:600;padding:10px 0}
 <!-- ============ HOME ============ -->
 <section class="screen on" id="s-home">
   <div class="hero">
-    <h1>สองเกม หนึ่งลิงก์ สำหรับงาน outing</h1>
+    <h1>สองเกม หนึ่งลิงก์ สำหรับงานกิจกรรม</h1>
     <p>เปิดจากจอบนเวทีก็ได้ ให้ทุกคนสแกนเข้ามาจากมือถือก็ได้ เลือกเกมที่จะเล่นได้เลย</p>
   </div>
   <div class="picker">
@@ -382,7 +382,7 @@ details.settings summary{cursor:pointer;font-weight:600;padding:10px 0}
     <div class="sheet">
       <div class="row" style="justify-content:space-between">
         <div>
-          <h3 style="font-size:22px">ห้อง OUTING-01</h3>
+          <h3 style="font-size:22px">ห้อง ROOM-01</h3>
           <p class="hint" style="margin:4px 0 0" id="h-count">ยังไม่มีคนเข้าห้อง</p>
         </div>
         <button class="btn ghost" id="h-opentab">เปิดมุมพนักงานอีกแท็บ</button>
@@ -811,7 +811,7 @@ $('#btn-csv').addEventListener('click',()=>{
   const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
-  a.download='outing-lucky-draw.csv'; a.click();
+  a.download='lucky-draw.csv'; a.click();
 });
 $('#btn-clearlog').addEventListener('click',()=>{ logs=[]; store.set('tdfb_logs',logs); renderLog(); toast('ล้างบันทึกแล้ว'); });
 

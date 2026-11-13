@@ -9,7 +9,7 @@ import { approved, castVote, isOpen, VOTE_ERROR_TH, weightOf } from './logic';
 import { seedState, uid } from './seed';
 import type { Contestant, VoteEvent, VoteState } from './types';
 
-const KEY = 'oc_vote_state_v1';
+const KEY = 'oc_vote_state_v2'; // v2: ข้อมูลตัวอย่างไม่มีชื่องานเฉพาะ
 const ME = 'oc_vote_me';
 const CH = 'oc_vote';
 

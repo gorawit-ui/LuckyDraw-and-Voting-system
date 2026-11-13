@@ -3,10 +3,17 @@
 export const MASCOT = (pose: 'hero' | 'wheel' | 'gacha' | 'judge' | 'runway' | 'nervous' | 'winner' | 'sad') => `/brand/mascot/${pose}.webp`;
 export const STICKER = (name: string) => `/brand/stickers/${name}.webp`;
 
+/**
+ * ข้อมูลแบรนด์ — ตั้งใจให้กลางๆ ใช้ซ้ำได้ทุกงาน (ปาร์ตี้ ปีใหม่ งานเลี้ยง กิจกรรมทีม) ห้ามใส่ชื่องานเฉพาะในโค้ด
+ * ชื่องานจริงของแต่ละครั้งตั้งในหลังบ้าน (เช่นชื่อ "งาน" ใน Fashion Vote)
+ * logo: ภาพโลโก้ (ไม่มี = ใช้ตัวหนังสือ CSS แทน) — รอภาพใหม่ตาม docs/CHATGPT-PROMPTS.md Prompt 7
+ */
 export const site = {
-  name: 'OUTING CHALLENGE',
-  nameTh: 'รวมเกมวันเอาท์ติ้ง',
-  tagline: 'สุ่ม · ลุ้น · โหวต — ทุกอย่างของวันเอาท์ติ้งอยู่ในที่เดียว',
+  name: 'PARTY CHALLENGE',
+  nameLines: ['PARTY', 'CHALLENGE'],
+  nameTh: 'รวมเกมสำหรับทุกงานกิจกรรม',
+  tagline: 'สุ่ม · ลุ้น · โหวต — ครบทุกเกมของงานนี้ในที่เดียว',
+  logo: null as string | null,
 };
 
 export type ZoneLink = { href: string; label: string; icon: string; note?: string; mascot?: string };

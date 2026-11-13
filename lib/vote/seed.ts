@@ -23,7 +23,7 @@ export function seedState(): VoteState {
   });
   const now = Date.now();
   const current: VoteEvent = {
-    id: 'ev_outing', name: 'Outing 2026 · Fashion Walk', status: 'registration', durationMin: 5, endsAt: null, revealStep: 0, createdAt: now,
+    id: 'ev_main', name: 'Fashion Walk 2026', status: 'registration', durationMin: 5, endsAt: null, revealStep: 0, createdAt: now,
     contestants: [
       mk('U07', 'นางฟ้าพริกเผา', '🌶️', 0), mk('U16', 'อัศวินกล่องลัง', '📦', 30), mk('U25', 'ราชินีมัทฉะ', '🍵', 120),
       mk('U12', 'ซูเปอร์ฮีโร่ไลน์ผลิต', '🦸', 210), mk('U21', 'ดิสโก้ยุค 80', '🪩', 280), mk('U23', 'แฮกเกอร์สายมู', '🧿', 250),

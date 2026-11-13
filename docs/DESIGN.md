@@ -55,10 +55,10 @@
 
 ## 5. Landing page layout (Phase 0)
 ```
-┌ Navbar: [GO] OUTING CHALLENGE ········ หน้าแรก | 🎡 Lucky Zone ▾ | 👑 Fashion Vote ▾ ┐
+┌ Navbar: [GO] PARTY CHALLENGE   ········ หน้าแรก | 🎡 Lucky Zone ▾ | 👑 Fashion Vote ▾ ┐
 │ HERO   ▶ PRESS START                                                              │
-│        OUTING / CHALLENGE  (ตัวใหญ่ขอบดำ)       🌶️ 🔥 ⭐ ลอยรอบๆ                    │
-│        [3 เกม] [รวมเกมวันเอาท์ติ้ง]  tagline                                           │
+│        PARTY / CHALLENGE   (ตัวใหญ่ขอบดำ)       🌶️ 🔥 ⭐ ลอยรอบๆ                    │
+│        [3 เกม] [รวมเกมทุกงาน]       tagline                                           │
 ├──────────────────────────────────────────────────────────────────────────────┤
 │  ┌ ซองฟ้า: Lucky Zone ┐     ┌ ซองมิ้นต์: Fashion Vote ┐   ← การ์ดเอียงนิดๆ hover เด้ง  │
 │  └ ชิป: วงล้อคู่ · กาชาปอง ┘ └ ชิป: โหวต · จอเวที · Host ┘                               │

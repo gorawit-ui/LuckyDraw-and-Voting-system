@@ -5,7 +5,7 @@ Handoff เดิม (`costume-vote/SPEC.md` §3) **เคยตัด Vercel �
 งานภายในบริษัทอาจเข้าข่ายใช้ไม่ได้ — ทางเลือก:
 1. ใช้ Vercel **Pro** (หรือ Pro trial) ของทีม สำหรับช่วง demo
 2. ใช้ Hobby เฉพาะ demo สั้นๆ ไม่มีข้อมูลจริง แล้วลบทิ้ง (ให้หัวหน้า/IT รับทราบ)
-3. ข้าม Vercel ไป deploy `outing-demo` บน Cloud Run เลย (ขั้นตอนด้านล่าง ใช้เวลา ~5 นาที)
+3. ข้าม Vercel ไป deploy `party-challenge-demo` บน Cloud Run เลย (ขั้นตอนด้านล่าง ใช้เวลา ~5 นาที)
 
 > ✅ **ตัดสินใจแล้ว (2026-11-12): ข้อ 2** — Vercel Hobby สำหรับ demo สั้นๆ ข้อมูลตัวอย่างเท่านั้น **ห้ามใส่ env Slack/Sheet/Firebase จริง** แล้วลบ project หลังจบ demo
 > ลบ: Vercel → Project → Settings → General → Delete Project
@@ -20,7 +20,7 @@ Handoff เดิม (`costume-vote/SPEC.md` §3) **เคยตัด Vercel �
 
 ## B. Cloud Run (ตัวจริง)
 ```bash
-gcloud run deploy outing-challenge \
+gcloud run deploy party-challenge \
   --source . \
   --region asia-southeast1 \
   --allow-unauthenticated \

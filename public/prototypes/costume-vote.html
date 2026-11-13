@@ -278,7 +278,7 @@ function seed(){
   const r=rng(2026), cs=past.contestants, cIds=cs.map(c=>c.slackId);
   users.filter(u=>!cIds.includes(u.id)).forEach((u,i)=>{if(r()<.9){const c=pickWeighted(cs,[4,5,3,2],r);past.votes.push({id:uid('v_'),voterId:u.id,contestantId:c.id,weight:managerIds.includes(u.id)?10:1,at:past.createdAt+60000+i*9000});}});
   past.revealStep=past.contestants.length;
-  const cur={id:'ev_outing26',name:'Outing 2026 ประกวดชุดแฟนซี',status:'registration',durationMin:5,endsAt:null,createdAt:Date.now(),revealStep:0,votes:[],
+  const cur={id:'ev_party26',name:'Party 2026 ประกวดชุดแฟนซี',status:'registration',durationMin:5,endsAt:null,createdAt:Date.now(),revealStep:0,votes:[],
     contestants:[mkC('U07','แม่มดรับงานด่วน','🧙‍♀️',280),mkC('U12','ไดโนเสาร์เดินสายไฟ','🦖',120),mkC('U17','นางฟ้าสายออฟฟิศ','👼',50),mkC('U23','นักบินอวกาศกล่องลัง','🧑‍🚀',200),mkC('U25','ผีเสื้อราตรี','🦋',310),mkC('U20','โจรสลัดคลังสินค้า','🏴‍☠️',20,'pending')]};
   return{users,managerIds,hostIds:['U01','U02'],events:[cur,past],activeEventId:cur.id};
 }
@@ -486,7 +486,7 @@ function hostEvents(){
     return `<div class="evcard ${active?'active':''}"><div><div class="row" style="gap:8px">${pill(e.status)}<span class="hint">${fmtD(e.createdAt)}</span></div><h3 style="margin-top:6px">${esc(e.name)}</h3>
       <p class="hint">ผู้ประกวด ${approved(e).length} คน, โหวต ${e.votes.length} ครั้ง${w?`, ผู้ชนะ ${esc(w.c.title)} (${esc(w.c.name)}) ${w.score} คะแนน`:''}</p></div>
       <div class="row">${active?'<span class="tag h">กำลังใช้งาน</span>':`<button class="btn sm primary" data-act="setActive" data-id="${e.id}">เปิดดูงานนี้</button><button class="btn sm danger" data-act="delEvent" data-id="${e.id}">ลบ</button>`}</div></div>`;}).join('');
-  return `<div class="stack"><form class="panel row" data-form="newEvent"><div class="field" style="flex:1;min-width:220px"><label for="n-ev">สร้างงานใหม่</label><input id="n-ev" name="name" required placeholder="เช่น Outing 2027 ประกวดชุดธีมยุค 90"></div><button class="btn primary" type="submit" style="align-self:flex-end">สร้างงาน</button></form>
+  return `<div class="stack"><form class="panel row" data-form="newEvent"><div class="field" style="flex:1;min-width:220px"><label for="n-ev">สร้างงานใหม่</label><input id="n-ev" name="name" required placeholder="เช่น Party 2027 ประกวดชุดธีมยุค 90"></div><button class="btn primary" type="submit" style="align-self:flex-end">สร้างงาน</button></form>
     <div class="stack">${cards}</div>
     <div class="row"><button class="btn ghost sm" data-act="resetDemo">ล้างข้อมูลและเริ่มตัวอย่างใหม่</button></div></div>`;
 }

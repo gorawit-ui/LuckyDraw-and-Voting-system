@@ -20,7 +20,8 @@
 
 ## Prompt 0 — Style Lock (วางก่อนทุกอย่าง)
 ```
-I'm designing a fun company-outing web app (lucky-draw wheel, gift-exchange gachapon, and a fashion-walk voting game).
+I'm designing a fun, reusable company event web app called "PARTY CHALLENGE" (lucky-draw wheel, gift-exchange gachapon, and a fashion-walk voting game).
+It will be reused for many kinds of events, so never add event-specific words (e.g. "outing", a year, a venue) to any image.
 Use the attached snack bag ONLY as a style reference. Do NOT copy its logo, brand name, characters or text.
 
 Style rules for every image in this chat:
@@ -100,11 +101,24 @@ Wide 16:9 stage background (1920x1080), no text, no characters:
 
 ## Prompt 7 — โลโก้ตัวอักษร (อังกฤษเท่านั้น)
 ```
-Design a wordmark logo "OUTING CHALLENGE" in two lines, chunky rounded heavy letters, mustard yellow fill,
+Design a wordmark logo "PARTY CHALLENGE" in two lines, chunky rounded heavy letters, mustard yellow fill,
 thick black outline, hard offset black shadow, small pixel-flame accent. Transparent background, 1600x800.
-Spell it exactly: O-U-T-I-N-G  C-H-A-L-L-E-N-G-E.
+Spell it exactly: P-A-R-T-Y  C-H-A-L-L-E-N-G-E.
 ```
 → `logo.png` (ถ้าตัวสะกดเพี้ยน ไม่ต้องใช้ — โค้ดทำโลโก้ด้วย CSS ได้อยู่แล้ว)
+
+## Prompt 7b — แก้โลโก้เดิมเป็น PARTY CHALLENGE (2026-11-13)
+แนบไฟล์ `OUTING_CHALLENGE_Wordmark_1600x800.png` เดิมแล้ววาง:
+```
+Edit the attached wordmark logo. Replace the word "OUTING" with "PARTY" so it reads "PARTY CHALLENGE" on two lines
+(line 1: PARTY, line 2: CHALLENGE). Keep EVERYTHING else identical: the same chunky rounded heavy letters,
+mustard yellow fill #FFD23F, thick black outline, hard offset black shadow, the small pixel flame accent
+at the top-right of the first line, transparent background, 1600x800.
+Center line 1 above line 2 (PARTY is shorter than OUTING, so do not leave a gap on the right).
+Spell it exactly: P-A-R-T-Y  C-H-A-L-L-E-N-G-E. No other text, no year, no event name.
+```
+→ ตั้งชื่อ `PARTY_CHALLENGE_Wordmark_1600x800.png` ใส่โฟลเดอร์ "06: Prompt 7" ใน Drive แล้วแจ้ง Claude
+(ถ้าแก้แล้วตัวอักษรเพี้ยน ใช้ Prompt 7 ด้านบนสร้างใหม่แทน — ชื่อในนั้นอัปเดตแล้ว)
 
 ## Prompt 8 — OG image + favicon
 ```
@@ -118,7 +132,7 @@ App icon 512x512: mascot Jeed's face only, mustard circle background, thick outl
 
 ## Prompt 9 — คำพูดบนเว็บ + สคริปต์พิธีกร (ข้อความ ไม่ใช่ภาพ)
 ```
-ช่วยเขียน microcopy ภาษาไทยสำหรับเว็บเกมงานเอาท์ติ้งบริษัท โทนสนุก กวนนิดๆ สุภาพกับผู้ใหญ่ สั้นไม่เกิน 6 คำต่อปุ่ม
+ช่วยเขียน microcopy ภาษาไทยสำหรับเว็บเกมงานกิจกรรมบริษัท (ใช้ได้ทุกงาน ห้ามระบุชื่องาน) โทนสนุก กวนนิดๆ สุภาพกับผู้ใหญ่ สั้นไม่เกิน 6 คำต่อปุ่ม
 ขอเป็นตาราง: จุดที่ใช้ | ข้อความ 3 ตัวเลือก
 จุดที่ใช้: ปุ่มเริ่มหมุนวงล้อ, ปุ่มหยุดวงล้อ, ข้อความตอนได้ของรางวัล, ปุ่มบันทึกแล้วหมุนต่อ,
 หน้ารอเข้าห้องกาชาปอง, ข้อความตอนแคปซูลแตก, ปุ่มโหวต, ข้อความยืนยันโหวต (เตือนว่าแก้ไม่ได้),
