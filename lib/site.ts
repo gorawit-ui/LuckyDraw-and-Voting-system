@@ -6,14 +6,14 @@ export const STICKER = (name: string) => `/brand/stickers/${name}.webp`;
 /**
  * ข้อมูลแบรนด์ — ตั้งใจให้กลางๆ ใช้ซ้ำได้ทุกงาน (ปาร์ตี้ ปีใหม่ งานเลี้ยง กิจกรรมทีม) ห้ามใส่ชื่องานเฉพาะในโค้ด
  * ชื่องานจริงของแต่ละครั้งตั้งในหลังบ้าน (เช่นชื่อ "งาน" ใน Fashion Vote)
- * logo: ภาพโลโก้ (ไม่มี = ใช้ตัวหนังสือ CSS แทน) — รอภาพใหม่ตาม docs/CHATGPT-PROMPTS.md Prompt 7
+ * logo: ภาพโลโก้ (null = ใช้ตัวหนังสือ CSS แทน) — ภาพจาก docs/CHATGPT-PROMPTS.md Prompt 7b
  */
 export const site = {
   name: 'PARTY CHALLENGE',
   nameLines: ['PARTY', 'CHALLENGE'],
   nameTh: 'รวมเกมสำหรับทุกงานกิจกรรม',
   tagline: 'สุ่ม · ลุ้น · โหวต — ครบทุกเกมของงานนี้ในที่เดียว',
-  logo: null as string | null,
+  logo: '/brand/logo.webp' as string | null,
 };
 
 export type ZoneLink = { href: string; label: string; icon: string; note?: string; mascot?: string };
@@ -43,6 +43,9 @@ export const zones: Zone[] = [
     links: [
       { href: '/lucky/wheel', label: 'วงล้อคู่', icon: 'bi-bullseye', note: 'จอเวที · คนคุมกดเอง', mascot: '/brand/mascot/wheel.webp' },
       { href: '/lucky/gacha', label: 'ตู้กาชาปอง', icon: 'bi-gift', note: 'มือถือทุกคน · จับคู่แลกของ', mascot: '/brand/mascot/gacha.webp' },
+      { href: '/lucky/gacha/host', label: 'กาชาปอง · host', icon: 'bi-sliders' },
+      { href: '/lucky/gacha/stage', label: 'กาชาปอง · จอเวที', icon: 'bi-easel' },
+      { href: '/lucky/verify', label: 'ตรวจผลด้วยตัวเอง', icon: 'bi-shield-check' },
     ],
     prototype: '/prototypes/lucky-wheel-gacha.html',
   },

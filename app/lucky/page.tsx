@@ -9,7 +9,7 @@ export default function LuckyHub() {
     <main className="container py-5">
       <h1 className="display-pop text-center mb-5" style={{ fontSize: 'clamp(2.5rem, 8vw, 4.5rem)' }}>🎡 LUCKY ZONE</h1>
       <div className="row g-4 justify-content-center">
-        {z.links.map((l) => (
+        {z.links.filter((l) => l.mascot).map((l) => (
           <div key={l.href} className="col-12 col-md-6 col-lg-5">
             <Link href={l.href} className="snack-pack pack-lucky">
               <div className="pack-body text-center">

@@ -11,7 +11,7 @@ npm run dev        # http://localhost:3000
 |---|---|---|
 | หน้าแรก (เลือกเกม) | `/` | ✅ |
 | Lucky Zone · วงล้อคู่ | `/lucky/wheel` | ✅ Phase 1 |
-| Lucky Zone · กาชาปอง | `/lucky/gacha` | 🚧 placeholder → ต้นแบบ |
+| Lucky Zone · กาชาปอง | `/lucky/gacha` · `/lucky/gacha/host` · `/lucky/gacha/stage` · `/lucky/verify` | 🟡 Phase 3a (backend จำลอง) |
 | Fashion Vote | `/vote` · `/vote/stage` · `/vote/admin` | 🟡 Phase 2a (backend จำลอง) |
 | ต้นแบบเดิม (เล่นได้) | `/prototypes/lucky-wheel-gacha.html` · `/prototypes/costume-vote.html` | 📦 |
 
