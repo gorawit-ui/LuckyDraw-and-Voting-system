@@ -1,4 +1,5 @@
 'use client';
+import ConnBanner from '@/components/ConnBanner';
 import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import CapsuleAnim from '@/components/gacha/CapsuleAnim';
@@ -11,7 +12,7 @@ import { MASCOT } from '@/lib/site';
 import { useNow, useToast } from '@/lib/vote/hooks';
 
 export default function GachaPlayer() {
-  const { ready, room, member, removed } = useGacha();
+  const { ready, room, member, removed, conn } = useGacha();
   const [toast, show] = useToast();
   const now = useNow(100);
   const phase = animPhase(room?.revealAt ?? null, now);
@@ -25,6 +26,7 @@ export default function GachaPlayer() {
 
   return (
     <main className="container py-3 py-md-4" style={{ maxWidth: 560 }}>
+      <ConnBanner conn={conn} />
       <h1 className="display-pop text-center mb-3" style={{ fontSize: 'clamp(1.8rem, 7vw, 2.8rem)' }}>🎁 ตู้กาชาปอง</h1>
       {!room && <Card mascot="nervous" title="ยังไม่เปิดห้อง" text="รอ host เปิดห้องสักครู่ แล้วรีเฟรชหน้านี้" />}
 
@@ -72,7 +74,7 @@ export default function GachaPlayer() {
 function JoinForm({ removed, roomId, show }: { removed: boolean; roomId: string; show: (m: string) => void }) {
   const [name, setName] = useState('');
   return (
-    <form className="card-pop p-4" onSubmit={(e) => { e.preventDefault(); const r = gachaApi.join(name); if (!r.ok) show(r.error); }}>
+    <form className="card-pop p-4" onSubmit={(e) => { e.preventDefault(); void gachaApi.join(name).then((r) => { if (!r.ok) show(r.error); }); }}>
       <div className="text-center">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={MASCOT('gacha')} alt="" width={720} height={720} style={{ width: 140, height: 'auto' }} />

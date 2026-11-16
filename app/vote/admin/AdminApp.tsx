@@ -1,4 +1,5 @@
 'use client';
+import ConnBanner from '@/components/ConnBanner';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import ContestantArt from '@/components/vote/ContestantArt';
@@ -19,15 +20,15 @@ const TABS: [Tab, string, string][] = [
 ];
 
 export default function AdminApp() {
-  const { ready, state, event, user } = useVote();
+  const { ready, state, event, user, conn } = useVote();
   const [tab, setTab] = useState<Tab>('overview');
   const [toast, show] = useToast();
-  const run = (r: Result) => { if (r.ok) { if (r.msg) show(r.msg); } else show(r.error); };
+  const run = async (p: Result | Promise<Result>) => { const r = await p; if (r.ok) { if (r.msg) show(r.msg); } else show(r.error); return r; };
 
   // หมดเวลา → ปิดอัตโนมัติ (หน้า host ที่เปิดอยู่ทำหน้าที่นี้ใน mock; ของจริงทำที่ server)
   const now = useNow(1000);
   useEffect(() => {
-    if (event?.status === 'voting' && event.endsAt && now >= event.endsAt) { const r = voteApi.autoCloseIfExpired(); if (r.ok) show(r.msg ?? ''); }
+    if (event?.status === 'voting' && event.endsAt && now >= event.endsAt) void voteApi.autoCloseIfExpired().then((r) => { if (r.ok) show(r.msg ?? ''); });
   }, [now, event, show]);
 
   if (!ready || !state || !event) return <main className="container py-5 text-center text-cream"><div className="spinner-border" /></main>;
@@ -44,6 +45,7 @@ export default function AdminApp() {
 
   return (
     <main className="container-xxl py-3 py-md-4">
+      <ConnBanner conn={conn} host />
       <header className="d-flex flex-wrap align-items-center gap-2 mb-3">
         <div className="me-auto">
           <span className={`status-pill status-${event.status}`}>{STATUS_LABEL[event.status]}</span>
@@ -74,7 +76,7 @@ export default function AdminApp() {
 // =============================== ภาพรวม ===============================
 const STEPS: EventStatus[] = ['registration', 'voting', 'closed', 'revealed'];
 
-function Overview({ state, event: e, now, run, show }: { state: VoteState; event: VoteEvent; now: number; run: (r: Result) => void; show: (m: string) => void }) {
+function Overview({ state, event: e, now, run, show }: { state: VoteState; event: VoteEvent; now: number; run: (r: Result | Promise<Result>) => Promise<Result>; show: (m: string) => void }) {
   const st = stats(state, e);
   const rows = tally(e);
   const top = rows[0]?.points || 1;
@@ -104,7 +106,7 @@ function Overview({ state, event: e, now, run, show }: { state: VoteState; event
                     onChange={(x) => setDur(x.target.value)} onBlur={() => run(voteApi.setDuration(Number(dur)))} />
                 </div>
                 <button type="button" className="btn btn-pop btn-pop-green btn-lg" disabled={!approved(e).length}
-                  onClick={() => { voteApi.setDuration(Number(dur)); run(voteApi.openVoting()); }}>
+                  onClick={() => run(voteApi.openVoting(Number(dur)))}>
                   <i className="bi bi-play-fill me-1" />เปิดโหวต
                 </button>
                 {!approved(e).length && <span className="small fw-semibold">ต้องอนุมัติผู้ประกวดอย่างน้อย 1 คนก่อน</span>}
@@ -229,14 +231,13 @@ function Overview({ state, event: e, now, run, show }: { state: VoteState; event
 }
 
 // =============================== ผู้ประกวด ===============================
-function Contestants({ state, event: e, run, show }: { state: VoteState; event: VoteEvent; run: (r: Result) => void; show: (m: string) => void }) {
+function Contestants({ state, event: e, run, show }: { state: VoteState; event: VoteEvent; run: (r: Result | Promise<Result>) => Promise<Result>; show: (m: string) => void }) {
   const locked = e.status !== 'registration';
   const [f, setF] = useState({ name: '', team: '', title: '', slackId: '', photo: null as string | null });
   const add = (x: React.FormEvent) => {
     x.preventDefault();
-    const r = voteApi.addContestant({ name: f.name, team: f.team, title: f.title, photo: f.photo, slackId: f.slackId || null });
-    run(r);
-    if (r.ok) setF({ name: '', team: '', title: '', slackId: '', photo: null });
+    void run(voteApi.addContestant({ name: f.name, team: f.team, title: f.title, photo: f.photo, slackId: f.slackId || null }))
+      .then((r) => r.ok && setF({ name: '', team: '', title: '', slackId: '', photo: null }));
   };
   const linkUser = (id: string) => {
     const u = state.users.find((x) => x.id === id);
@@ -295,7 +296,7 @@ function Contestants({ state, event: e, run, show }: { state: VoteState; event: 
 }
 
 // =============================== ผู้ใช้และสิทธิ์ ===============================
-function Users({ state, run }: { state: VoteState; run: (r: Result) => void }) {
+function Users({ state, run }: { state: VoteState; run: (r: Result | Promise<Result>) => Promise<Result> }) {
   const [q, setQ] = useState('');
   const list = state.users.filter((u) => !q || (u.name + u.dept).toLowerCase().includes(q.toLowerCase()));
   return (
@@ -326,18 +327,18 @@ function Users({ state, run }: { state: VoteState; run: (r: Result) => void }) {
 }
 
 // =============================== งานทั้งหมด ===============================
-function Events({ state, run }: { state: VoteState; run: (r: Result) => void }) {
+function Events({ state, run }: { state: VoteState; run: (r: Result | Promise<Result>) => Promise<Result> }) {
   const [name, setName] = useState('');
   const [view, setView] = useState<VoteEvent | null>(null);
   return (
     <div className="row g-3">
       <div className="col-lg-4">
-        <form className="card-pop p-3 p-md-4" onSubmit={(x) => { x.preventDefault(); const r = voteApi.createEvent(name); run(r); if (r.ok) setName(''); }}>
+        <form className="card-pop p-3 p-md-4" onSubmit={(x) => { x.preventDefault(); void run(voteApi.createEvent(name)).then((r) => r.ok && setName('')); }}>
           <h2 className="h5"><i className="bi bi-calendar-plus me-2" />สร้างงานใหม่</h2>
           <input className="form-control mb-2" placeholder="เช่น ประกวดชุดไทย" value={name} onChange={(x) => setName(x.target.value)} required />
           <button type="submit" className="btn btn-pop w-100">สร้างและใช้งาน</button>
         </form>
-        <button type="button" className="btn btn-sm btn-link text-cream mt-2" onClick={() => { if (confirm('ล้างข้อมูล demo ทั้งหมดกลับเป็นตัวอย่าง?')) voteApi.factoryReset(); }}>
+        <button type="button" className="btn btn-sm btn-link text-cream mt-2" onClick={() => { if (confirm('ล้างข้อมูล demo ทั้งหมดกลับเป็นตัวอย่าง?')) void run(voteApi.factoryReset()); }}>
           ล้างข้อมูล demo ทั้งหมด
         </button>
       </div>

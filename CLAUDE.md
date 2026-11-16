@@ -17,5 +17,6 @@ Next.js 16 (App Router, TS) · Bootstrap 5.3 + SCSS (`styles/_tokens.scss` → `
 - ใช้ Bootstrap grid/utility ก่อนเขียน CSS เอง · สี/ขนาดใหม่ให้เพิ่มเป็น token ใน `_tokens.scss`
 - ข้อความไทยอยู่ในโค้ด ไม่อยู่ในภาพ · ภาพแบรนด์อยู่ใน `public/brand/**` (ดู `docs/CHATGPT-PROMPTS.md`)
 - ห้ามเก็บ state ห้องใน memory ของ server (Vercel/Cloud Run scale หลาย instance) → ใช้ Firestore
+  - ช่วง demo: state กาชาปอง/โหวตผ่าน `/api/store/[name]` (`lib/shared/kv.ts`: Upstash Redis ถ้ามี env, ไม่งั้น memory สำหรับรันในเครื่องเท่านั้น) · กติกาอยู่ใน `lib/*/reducer.ts` รันที่ server
 - สุ่มกาชาปองต้องใช้ `lib/fair-draw.ts` ทั้ง server และหน้าตรวจผล
 - ตรวจ `npm run typecheck && npm run build` ก่อน commit · ทดสอบมือถือ 390px ไม่มี scroll แนวนอน

@@ -1,11 +1,12 @@
 'use client';
 import { useCallback, useEffect, useState } from 'react';
+import { serverNow } from '@/lib/shared/clock';
 
-/** เวลาปัจจุบัน อัปเดตทุก ms (ใช้กับนับถอยหลัง) */
+/** เวลาปัจจุบันตามนาฬิกา server อัปเดตทุก ms (นับถอยหลัง/เปิดแคปซูลพร้อมกันทุกเครื่อง) */
 export function useNow(ms = 500) {
-  const [now, setNow] = useState(() => Date.now());
+  const [now, setNow] = useState(() => serverNow());
   useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), ms);
+    const t = setInterval(() => setNow(serverNow()), ms);
     return () => clearInterval(t);
   }, [ms]);
   return now;

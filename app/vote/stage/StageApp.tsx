@@ -20,7 +20,7 @@ export default function StageApp() {
   const lastStep = useRef<number | null>(null);
 
   useEffect(() => {
-    if (event?.status === 'voting' && event.endsAt && now >= event.endsAt) voteApi.autoCloseIfExpired();
+    if (event?.status === 'voting' && event.endsAt && now >= event.endsAt) void voteApi.autoCloseIfExpired();
   }, [now, event]);
 
   // คีย์ลัด (host เท่านั้น) — รีโมตพรีเซนต์ใช้ได้

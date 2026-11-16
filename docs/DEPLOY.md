@@ -27,13 +27,21 @@ Handoff เดิม (`costume-vote/SPEC.md` §3) **เคยตัด Vercel �
    - Root Directory: `./` · Build/Output/Install: ค่าเริ่มต้น
    - **Environment Variables: ไม่ต้องใส่** (เดโมใช้ข้อมูลตัวอย่าง ห้ามใส่ค่า Slack/Sheet จริง ตาม D7)
 5. กด **Deploy** → รอ ~1–2 นาที → ได้ลิงก์ `https://<project>.vercel.app`
-6. ลองเปิด: `/` · `/lucky/wheel` · `/lucky/gacha/host` · `/vote/admin` แล้วส่งลิงก์ให้ทีม
-7. **จบเดโมแล้วลบ:** Project → **Settings → General** → เลื่อนล่างสุด **Delete Project**
+6. **ต่อที่เก็บข้อมูลกลาง (ต้องทำ ไม่งั้นมือถือแต่ละเครื่องเห็นห้องไม่ตรงกัน)** — ฟรี
+   1. ใน Project กดแท็บ **Storage** → **Create Database** (หรือ *Browse Marketplace*) → เลือก **Upstash → Upstash for Redis** → Continue
+   2. Plan: **Free** · Region: ใกล้ที่สุด (เช่น Singapore) · ตั้งชื่อ เช่น `party-challenge-demo-kv` → Create
+   3. หน้า *Connect Project* เลือก project นี้ ติ๊กทุก Environment → **Connect** (Vercel ใส่ env `KV_REST_API_URL` / `KV_REST_API_TOKEN` ให้เอง)
+   4. แท็บ **Deployments** → ⋯ ที่ deploy ล่าสุด → **Redeploy** (env ใหม่มีผลหลัง deploy ใหม่)
+   - ตรวจ: เปิด `https://<project>.vercel.app/api/store/gacha` ต้องเห็น `"backend":"redis"`
+   - เก็บแค่ข้อมูลเดโม (ชื่อเล่น/ผลจับคู่) และหมดอายุเองใน 7 วัน
+7. ลองเปิด: `/` · `/lucky/wheel` · `/lucky/gacha/host` · `/vote/admin` แล้วส่งลิงก์ให้ทีม — มือถือสแกน QR บนหน้า host ได้เลย
+8. **จบเดโมแล้วลบ:** Storage → database นั้น → Settings → **Delete** แล้ว Project → **Settings → General** → เลื่อนล่างสุด **Delete Project**
 
 **หมายเหตุ**
 - branch ที่ deploy = branch หลักของ repo (ตอนนี้คือ `claude/lucid-ride-0x80b4` เพราะเป็น branch เดียว) ทุก push ใหม่จะ deploy อัตโนมัติ
 - ถ้าภายหลังมี `main` แล้วอยากเดโม branch อื่น: Settings → Git → Production Branch หรือเปิดลิงก์ Preview ของ branch นั้นในแท็บ Deployments
-- ข้อมูลเกมเก็บในเบราว์เซอร์ของแต่ละคน (ระบบจำลอง) — เปิดหลายแท็บเป็นคนละคนได้ แต่มือถือหลายเครื่องยังไม่เห็นข้อมูลเดียวกันจนกว่าจะขึ้น Google Cloud
+- ข้อมูลกาชาปอง/โหวตอยู่ที่ server (`/api/store/*` → Upstash Redis) ทุกเครื่องเห็นชุดเดียวกัน · ล้างกลับเป็นตัวอย่างได้ที่ `/vote/admin` (ล้างข้อมูล demo) หรือเปิดห้องกาชาใหม่
+- ตัวตนในเดโม (ชื่อที่เลือกตอน login / PIN host / ชื่อที่เข้าห้อง) จำไว้ในเบราว์เซอร์ของเครื่องนั้น — ปิดแท็บแล้วสแกนใหม่ยังเป็นคนเดิม
 - ถ้า build ไม่ผ่าน: ดู log ในแท็บ Deployments → ตรวจ Node.js Version ใน Settings → General เป็น 20.x ขึ้นไป
 
 ## B. Cloud Run (ตัวจริง)
@@ -52,6 +60,15 @@ gcloud run deploy party-challenge \
 - วันงาน: ตั้ง `--min-instances=1` ชั่วคราวกัน cold start แล้วลดกลับเป็น 0 หลังงาน
 - ตั้ง budget alert $1/เดือน · Artifact Registry cleanup policy เก็บ 2–3 image ล่าสุด
 - Secrets (Slack, Firebase admin, Sheet logger) → Secret Manager แล้ว `--set-secrets`
+
+## A2. ทดสอบมือถือในวง Wi-Fi เดียวกัน (ไม่ต้องขึ้น Vercel)
+```bash
+npm run dev
+```
+- เปิดหน้า host บนคอม **ผ่าน IP ของเครื่อง** เช่น `http://192.168.1.20:3000/lucky/gacha/host` (ดู IP: macOS `ipconfig getifaddr en0` · Windows `ipconfig`)
+  ถ้าเปิดด้วย `localhost` QR จะชี้ไป `localhost` ซึ่งมือถือเข้าไม่ได้ (หน้า host จะขึ้นแถบเตือน)
+- มือถือต้องต่อ Wi-Fi วงเดียวกัน · Wi-Fi บริษัท/โรงแรมบางที่กันเครื่องคุยกันเอง (client isolation) → ใช้ hotspot มือถือแทน หรือขึ้น Vercel
+- ไม่ต้องตั้ง Redis: เครื่องที่รัน `npm run dev` เก็บข้อมูลไว้ในหน่วยความจำ (หายเมื่อปิด server)
 
 ## C. ทดสอบข้ามแพลตฟอร์ม (ก่อนวันงาน)
 | อุปกรณ์ | เบราว์เซอร์ |

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import CapsuleAnim from '@/components/gacha/CapsuleAnim';
 import Dice, { DiceRow } from '@/components/gacha/Dice';
+import ConnBanner from '@/components/ConnBanner';
 import QrCode, { absUrl } from '@/components/QrCode';
 import Modal from '@/components/vote/Modal';
 import Toast from '@/components/vote/Toast';
@@ -15,16 +16,17 @@ import { useNow, useToast } from '@/lib/vote/hooks';
 const STEPS: [Room['status'], string][] = [['open', 'เปิดรับคนเข้าห้อง'], ['locked', 'ล็อกห้อง + ทอยลูกเต๋า'], ['drawn', 'สุ่มแล้ว']];
 
 export default function GachaHost() {
-  const { ready, room, isHost } = useGacha();
+  const { ready, room, isHost, hostPin, conn } = useGacha();
   const [toast, show] = useToast();
-  const run = (r: Result) => { if (r.ok) { if (r.msg) show(r.msg); } else show(r.error); };
+  const run = async (p: Result | Promise<Result>) => { const r = await p; if (r.ok) { if (r.msg) show(r.msg); } else show(r.error); return r; };
   if (!ready) return <main className="container py-5 text-center text-cream"><div className="spinner-border" /></main>;
-  if (!room || !isHost) return <main className="container py-4" style={{ maxWidth: 620 }}><Claim room={room} run={run} /><Toast msg={toast} /></main>;
+  if (!room || !isHost) return <main className="container py-4" style={{ maxWidth: 620 }}><ConnBanner conn={conn} host /><Claim room={room} run={run} /><Toast msg={toast} /></main>;
   return (
     <main className="container-xxl py-3 py-md-4">
+      <ConnBanner conn={conn} host />
       <header className="d-flex flex-wrap align-items-center gap-2 mb-3">
         <h1 className="display-pop mb-0 me-auto" style={{ fontSize: 'clamp(1.6rem, 5vw, 2.6rem)' }}>🎁 กาชาปอง · {room.id}</h1>
-        <span className="chip-pop" title="ใช้เปิดหน้า host บนเครื่องอื่น"><i className="bi bi-key-fill" />PIN {room.hostPin}</span>
+        <span className="chip-pop" title="ใช้เปิดหน้า host บนเครื่องอื่น"><i className="bi bi-key-fill" />PIN {hostPin}</span>
         <Link href="/lucky/gacha/stage" target="_blank" className="btn btn-sm btn-pop"><i className="bi bi-easel me-1" />เปิดจอเวที</Link>
       </header>
       <div className="card-pop p-3 mb-3">
@@ -42,7 +44,7 @@ export default function GachaHost() {
 }
 
 // ---------- ยังไม่ได้เป็น host ----------
-function Claim({ room, run }: { room: Room | null; run: (r: Result) => void }) {
+function Claim({ room, run }: { room: Room | null; run: (r: Result | Promise<Result>) => Promise<Result> }) {
   const [p, setP] = useState('');
   return (
     <div className="card-pop p-4">
@@ -59,19 +61,19 @@ function Claim({ room, run }: { room: Room | null; run: (r: Result) => void }) {
       <button type="button" className="btn btn-pop btn-pop-green btn-lg w-100" onClick={() => run(gachaApi.createRoom())}>
         <i className="bi bi-plus-circle me-1" />เปิดห้องใหม่
       </button>
-      <p className="small mt-3 mb-0"><i className="bi bi-cone-striped me-1" />โหมดจำลอง: ยืนยัน host ด้วย PIN ของห้อง · ของจริงจะใช้ Slack</p>
+      <p className="small mt-3 mb-0"><i className="bi bi-cone-striped me-1" />โหมดทดสอบ: ยืนยัน host ด้วย PIN ของห้อง (ดูได้บนหน้า host ของเครื่องที่เปิดห้อง) · ของจริงจะใช้ Slack</p>
     </div>
   );
 }
 
 // ---------- เปิดรับ / ล็อก + ลูกเต๋า ----------
-function Setup({ room, run }: { room: Room; run: (r: Result) => void }) {
+function Setup({ room, run }: { room: Room; run: (r: Result | Promise<Result>) => Promise<Result> }) {
   const [name, setName] = useState('');
   const [ask, setAsk] = useState(false);
   const [busy, setBusy] = useState(false);
   const open = room.status === 'open';
   const joinUrl = absUrl('/lucky/gacha');
-  const doDraw = async () => { setBusy(true); const r = await gachaApi.draw(); setBusy(false); setAsk(false); run(r); if (r.ok) setTimeout(() => void gachaApi.sendSheet().then((x) => !x.ok && run(x)), 300); };
+  const doDraw = async () => { setBusy(true); const r = await run(gachaApi.draw()); setBusy(false); setAsk(false); if (r.ok) setTimeout(() => void gachaApi.sendSheet().then((x) => { if (!x.ok) void run(x); }), 300); };
   return (
     <div className="row g-3">
       <div className="col-lg-8">
@@ -90,7 +92,7 @@ function Setup({ room, run }: { room: Room; run: (r: Result) => void }) {
             {!room.members.length && <span className="opacity-75">ยังไม่มีคนเข้าห้อง — ให้ทุกคนสแกน QR</span>}
           </div>
           {open && (
-            <form className="d-flex gap-2" onSubmit={(e) => { e.preventDefault(); const r = gachaApi.hostAdd(name); run(r); if (r.ok) setName(''); }}>
+            <form className="d-flex gap-2" onSubmit={(e) => { e.preventDefault(); void run(gachaApi.hostAdd(name)).then((r) => r.ok && setName('')); }}>
               <input className="form-control" placeholder="เพิ่มชื่อแทนคนที่ไม่ถนัดมือถือ เช่น ป้าแดง (Admin)" value={name} onChange={(e) => setName(e.target.value)} maxLength={40} />
               <button type="submit" className="btn btn-pop text-nowrap"><i className="bi bi-person-plus me-1" />เพิ่ม</button>
             </form>
@@ -142,7 +144,7 @@ function Setup({ room, run }: { room: Room; run: (r: Result) => void }) {
 }
 
 // ---------- สุ่มแล้ว ----------
-function Drawn({ room, run }: { room: Room; run: (r: Result) => void }) {
+function Drawn({ room, run }: { room: Room; run: (r: Result | Promise<Result>) => Promise<Result> }) {
   const now = useNow(100);
   const phase = animPhase(room.revealAt, now);
   const [ask, setAsk] = useState(false);
@@ -186,7 +188,7 @@ function Drawn({ room, run }: { room: Room; run: (r: Result) => void }) {
         </div>
         <div className="card-pop p-3 p-md-4">
           <div className="d-flex align-items-center gap-2 mb-2"><span className="me-auto"><i className="bi bi-table me-1" />Google Sheet: <b>{sheetLabel}</b></span>
-            {room.sheet !== 'sent' && <button type="button" className="btn btn-sm btn-pop" onClick={() => void gachaApi.sendSheet().then(run)}>ส่งอีกครั้ง</button>}</div>
+            {room.sheet !== 'sent' && <button type="button" className="btn btn-sm btn-pop" onClick={() => void run(gachaApi.sendSheet())}>ส่งอีกครั้ง</button>}</div>
           <button type="button" className="btn btn-pop btn-pop-cream w-100" onClick={() => setAsk(true)}><i className="bi bi-plus-circle me-1" />เริ่มห้องใหม่</button>
         </div>
       </div>

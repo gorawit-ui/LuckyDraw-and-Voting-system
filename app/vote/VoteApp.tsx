@@ -1,4 +1,5 @@
 'use client';
+import ConnBanner from '@/components/ConnBanner';
 import Link from 'next/link';
 import { useState } from 'react';
 import ContestantArt from '@/components/vote/ContestantArt';
@@ -15,13 +16,14 @@ import { useVote, voteApi } from '@/lib/vote/mock-store';
 import { STATUS_LABEL, type Contestant, type User, type VoteEvent } from '@/lib/vote/types';
 
 export default function VoteApp() {
-  const { ready, event, user } = useVote();
+  const { ready, event, user, conn } = useVote();
   const [toast, show] = useToast();
   if (!ready || !event) return <main className="container py-5 text-center text-cream"><div className="spinner-border" /></main>;
   if (!user) return <main className="container py-4 py-md-5"><SignIn /></main>;
 
   return (
     <main className="container py-3 py-md-4 vote-page">
+      <ConnBanner conn={conn} />
       <header className="d-flex flex-wrap align-items-center gap-2 mb-3">
         <div className="me-auto">
           <span className={`status-pill status-${event.status}`}>{STATUS_LABEL[event.status]}</span>
@@ -79,7 +81,7 @@ function MyApplication({ c, show }: { c: Contestant; show: (m: string) => void }
       </div>
       {c.status === 'approved'
         ? <p className="small mt-3 mb-0"><i className="bi bi-info-circle me-1" />ผู้ประกวดอยู่บนเวที จึงลงคะแนนไม่ได้นะ</p>
-        : <button type="button" className="btn btn-sm btn-pop btn-pop-cream mt-3" onClick={() => { const r = voteApi.withdraw(); show(r.ok ? r.msg ?? '' : r.error); }}>
+        : <button type="button" className="btn btn-sm btn-pop btn-pop-cream mt-3" onClick={() => void voteApi.withdraw().then((r) => show(r.ok ? r.msg ?? '' : r.error))}>
             <i className="bi bi-x-circle me-1" />ถอนใบสมัคร
           </button>}
     </div>
@@ -92,14 +94,17 @@ function RegisterForm({ user, show }: { user: User; show: (m: string) => void })
   const [title, setTitle] = useState('');
   const [photo, setPhoto] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [sending, setSending] = useState(false);
   const onFile = async (f?: File) => {
     if (!f) return;
     setBusy(true);
     try { setPhoto(await resizeToDataUrl(f)); } catch (e) { show((e as Error).message); } finally { setBusy(false); }
   };
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const r = voteApi.register({ name, team, title, photo });
+    setSending(true);
+    const r = await voteApi.register({ name, team, title, photo });
+    setSending(false);
     show(r.ok ? r.msg ?? '' : r.error);
   };
   return (
@@ -117,7 +122,7 @@ function RegisterForm({ user, show }: { user: User; show: (m: string) => void })
         {busy && <div className="small mt-1"><span className="spinner-border spinner-border-sm me-1" />กำลังย่อรูป…</div>}
         {photo && <ContestantArt c={{ photo, emoji: '', hue: 0, name }} className="c-art-sm mt-2" />}
       </div>
-      <button type="submit" className="btn btn-pop w-100" disabled={busy}><i className="bi bi-send me-1" />ส่งใบสมัคร</button>
+      <button type="submit" className="btn btn-pop w-100" disabled={busy || sending}><i className="bi bi-send me-1" />ส่งใบสมัคร</button>
     </form>
   );
 }
@@ -141,10 +146,10 @@ function Voting({ event, user, show }: { event: VoteEvent; user: User; show: (m:
     const c = event.contestants.find((x) => x.id === voted.contestantId)!;
     return <Ticket c={c} weight={voted.weight} at={voted.at} remain={open ? remain : 0} />;
   }
-  const doVote = () => {
+  const doVote = async () => {
     if (!sel) return;
-    const r = voteApi.vote(sel);
     setConfirm(false);
+    const r = await voteApi.vote(sel);
     if (r.ok) burst(120);
     show(r.ok ? r.msg ?? '' : r.error);
   };
