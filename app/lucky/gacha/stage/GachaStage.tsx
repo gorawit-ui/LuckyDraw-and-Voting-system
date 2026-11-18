@@ -1,18 +1,18 @@
 'use client';
 import { useEffect, useRef } from 'react';
-import { DiceRow } from '@/components/gacha/Dice';
 import Ring from '@/components/gacha/Ring';
 import QrCode, { absUrl } from '@/components/QrCode';
 import { checkRules } from '@/lib/fair-draw';
 import { burst } from '@/lib/fx';
-import { animPhase, verifyRoomUrl } from '@/lib/gacha/logic';
+import { animPhase, displayName, resultRows, verifyRoomUrl } from '@/lib/gacha/logic';
 import { useGacha } from '@/lib/gacha/mock-store';
 import { MASCOT } from '@/lib/site';
 import { useNow } from '@/lib/vote/hooks';
 
 /**
- * จอเวทีกาชาปอง (แบบเปิดเผย) — ความเชื่อใจมาจาก "เห็นกระบวนการ" (SPEC §4)
- * ก่อนสุ่ม: รายชื่อ + จำนวน → ล็อก → แต้มลูกเต๋าตัวใหญ่ · ตอนสุ่ม: ชื่อสลับเป็นวงกลม · หลังสุ่ม: วงจริง + ตรวจกติกา 3 ข้อ + QR ตรวจเอง
+ * จอเวทีจับฉลากของขวัญ (แบบเปิดเผย) — ความเชื่อใจมาจาก "เห็นกระบวนการ"
+ * เปิดรับ: QR + รายชื่อ (เลข) ชื่อ · ล็อก: ให้ทุกคนเช็กชื่อตัวเอง · สุ่ม: ชื่อสลับเป็นวงกลม
+ * ผล: ตารางเรียงตาม Lucky Number "ชื่อคุณ → ได้รับของขวัญจาก" + ตรวจกติกา 3 ข้อ + QR ตรวจเอง
  */
 const RING_MAX = 30;
 
@@ -26,16 +26,18 @@ export default function GachaStage() {
   }, [phase, room]);
 
   if (!ready) return <main className="stage-root stage-lucky" />;
-  const names = room?.members.map((m) => m.name) ?? [];
-  const ringOrder = room?.pairs?.map((p) => p[0]) ?? names;
+  const members = [...(room?.members ?? [])].sort((a, b) => a.lucky - b.lucky);
+  const chips = members.map((m) => `(${m.lucky}) ${displayName(m)}`);
+  const ringNames = members.map((m) => `(${m.lucky}) ${m.nick || m.full}`);
   const rules = room?.pairs ? checkRules(room.pairs) : null;
-  // คนเยอะ (>30) วงกลมอ่านไม่ออกจากหลังห้อง → ใช้รายการลำดับเดินแลกของเป็นคอลัมน์แทน
-  const big = names.length > RING_MAX;
+  const rows = room?.pairs ? resultRows(room) : [];
+  const cols = rows.length <= 10 ? 2 : rows.length <= 30 ? 3 : rows.length <= 60 ? 4 : 5;
+  const big = rows.length > 30; // คนเยอะ: บรรทัดเดียว ไม่โชว์ทีม ให้พอดีจอเดียว
 
   return (
     <main className="stage-root stage-lucky">
       <div className="stage-inner">
-        <div className="stage-title">ตู้กาชาปองจับคู่แลกของขวัญ {room && `· ห้อง ${room.id}`}</div>
+        <div className="stage-title">จับฉลากของขวัญ {room && `· ห้อง ${room.id}`}</div>
 
         {!room && (
           <section className="text-center">
@@ -49,67 +51,48 @@ export default function GachaStage() {
           <section className="row align-items-center g-4">
             <div className="col-lg-8 text-center">
               <div className="stage-label">เข้าห้องแล้ว</div>
-              <div className="stage-count"><span>{names.length}</span><small> คน</small></div>
-              <div className="stage-names">{names.map((n) => <span key={n}>{n}</span>)}</div>
+              <div className="stage-count"><span>{members.length}</span><small> คน</small></div>
+              <div className="stage-names">{chips.map((n) => <span key={n}>{n}</span>)}</div>
             </div>
             <div className="col-lg-4 text-center">
               <QrCode text={absUrl('/lucky/gacha')} size={260} className="mx-auto" />
-              <p className="stage-sub mt-2 mb-0">สแกน → ใส่ชื่อ → รอลุ้น</p>
+              <p className="stage-sub mt-2 mb-0">หยิบการ์ด → สแกน → หาชื่อ → ใส่ Lucky Number</p>
             </div>
           </section>
         )}
 
         {room?.status === 'locked' && (
           <section className="text-center">
-            <div className="stage-label"><i className="bi bi-lock-fill me-2" />ล็อกห้องแล้ว ครบไหม?</div>
-            <div className="stage-count"><span>{names.length}</span><small> คน</small></div>
-            <div className="stage-names">{names.map((n) => <span key={n}>{n}</span>)}</div>
-            <p className="stage-rule">สุ่มครั้งเดียว ไม่สุ่มใหม่ · ลูกเต๋าเป็นคนสุ่ม</p>
-            {room.dice.length > 0 && <div className="stage-dice"><DiceRow dice={room.dice} size={110} /></div>}
+            <div className="stage-label"><i className="bi bi-lock-fill me-2" />ล็อกห้องแล้ว หาชื่อตัวเองเจอไหม?</div>
+            <div className="stage-count"><span>{members.length}</span><small> คน</small></div>
+            <div className="stage-names">{chips.map((n) => <span key={n}>{n}</span>)}</div>
+            <p className="stage-rule">สุ่มครั้งเดียว ไม่สุ่มใหม่ · ผลมาจาก Lucky Number ที่ทุกคนหยิบเอง</p>
           </section>
         )}
 
         {room?.status === 'drawn' && phase !== 'done' && (
           <section className="text-center">
-            <div className="stage-label">ลูกเต๋าจะพาแคปซูลไหนมาให้…</div>
-            {big
-              ? <div className="stage-names is-shuffling">{shuffleNames(names, Math.floor(now / 220)).map((n) => <span key={n}>{n}</span>)}</div>
-              : <div className="stage-ring"><Ring names={names} shuffleSeed={Math.floor(now / 220)} /></div>}
-            <DiceRow dice={room.dice} size={70} />
+            <div className="stage-label">แคปซูลไหนจะเป็นของใคร…</div>
+            {members.length > RING_MAX
+              ? <div className="stage-names is-shuffling">{shuffleNames(chips, Math.floor(now / 220)).map((n) => <span key={n}>{n}</span>)}</div>
+              : <div className="stage-ring"><Ring names={ringNames} shuffleSeed={Math.floor(now / 220)} /></div>}
           </section>
         )}
 
-        {room?.status === 'drawn' && phase === 'done' && rules && !big && (
-          <section className="row g-4 align-items-center">
-            <div className="col-lg-7">
-              <div className="stage-ring"><Ring names={ringOrder} arrows /></div>
-              <p className="stage-sub text-center mb-0">ตามเข็มนาฬิกา: แต่ละคนให้ของคนถัดไป</p>
-            </div>
-            <div className="col-lg-5">
-              <Checks rules={rules} />
-              <div className="stage-label small mb-2">แต้มลูกเต๋าที่ใช้สุ่ม</div>
-              <DiceRow dice={room.dice} size={64} />
-              <div className="d-flex align-items-center gap-3 mt-4">
-                <QrCode text={verifyRoomUrl(window.location.origin, room.id)} size={190} />
-                <p className="stage-sub mb-0">ใครสงสัย สแกนแล้วคำนวณเองได้เลย ได้ผลเดียวกันทุกครั้ง</p>
-              </div>
-            </div>
-          </section>
-        )}
-
-        {room?.status === 'drawn' && phase === 'done' && rules && big && (
+        {room?.status === 'drawn' && phase === 'done' && rules && (
           <section>
             <div className="d-flex flex-wrap align-items-center justify-content-center gap-4 mb-3">
               <Checks rules={rules} compact />
-              <DiceRow dice={room.dice} size={52} />
               <div className="d-flex align-items-center gap-2">
                 <QrCode text={verifyRoomUrl(window.location.origin, room.id)} size={130} />
-                <span className="fw-bold" style={{ maxWidth: 160 }}>สแกนตรวจผลเองได้</span>
+                <span className="fw-bold" style={{ maxWidth: 170 }}>สแกนตรวจผลเองได้ ได้ผลเดียวกันทุกครั้ง</span>
               </div>
             </div>
-            <div className="stage-label small mb-2 text-center">ลำดับเดินแลกของ ({room.pairs!.length} คน) · แต่ละคนให้ของคนถัดไป</div>
-            <ol className="stage-pairs" style={{ gridTemplateRows: `repeat(${Math.ceil(room.pairs!.length / 4)}, auto)` }}>
-              {room.pairs!.map(([a, b], i) => <li key={a}><span className="no">{i + 1}.</span> <b>{a}</b> → {b}</li>)}
+            <div className="stage-label small mb-2 text-center">หาเลขของคุณ → <i className="bi bi-gift" /> ไปรับของขวัญจากเพื่อนคนนี้</div>
+            <ol className={`stage-pairs is-result cols-${cols} ${big ? 'is-big' : ''}`} style={{ gridTemplateRows: `repeat(${Math.ceil(rows.length / cols)}, auto)` }}>
+              {rows.map(([m, g]) => (
+                <li key={m.id}><b className="no">({m.lucky})</b> <b>{m.nick || m.full}</b> <span className="arrow">←</span> <span className="no">({g.lucky})</span> {g.nick || g.full}{g.team && !big && <small> · {g.team}</small>}</li>
+              ))}
             </ol>
           </section>
         )}
