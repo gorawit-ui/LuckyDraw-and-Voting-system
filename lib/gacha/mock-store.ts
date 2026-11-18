@@ -21,7 +21,7 @@ export function useGacha() {
   const member = room && me && me.roomId === room.id ? room.members.find((m) => m.id === me.memberId) ?? null : null;
   // PIN ได้มาจาก server หลังตรวจแล้วเท่านั้น (server ไม่ส่ง PIN ให้เครื่องอื่น)
   const isHost = !!room && !!host && host.roomId === room.id;
-  return { ready: !!state, room, member, isHost, hostPin: isHost ? host!.pin : null, conn,
+  return { ready: !!state, room, roster: state?.roster ?? [], member, isHost, hostPin: isHost ? host!.pin : null, conn,
     removed: !!(room && me && me.roomId === room.id && !member) };
 }
 
@@ -37,12 +37,15 @@ export const gachaApi = {
   // ---------- host ----------
   createRoom: () => withHost(call('createRoom')),
   claimHost: (pin: string) => withHost(call('claimHost', pin)),
-  hostAdd: (name: string) => withHost(call('hostAdd', name)),
+  setRoster: (text: string) => withHost(call('setRoster', text)),
+  useSampleRoster: () => withHost(call('useSampleRoster')),
+  clearRoster: () => withHost(call('clearRoster')),
+  /** personId จากรายชื่อ หรือ typed = พิมพ์ชื่อเอง (ไม่มีในรายชื่อ) */
+  hostAdd: (personId: string | null, typed: string, lucky: number | null) => withHost(call('hostAdd', personId, typed, lucky)),
   hostRemove: (id: string) => withHost(call('hostRemove', id)),
   demoFill: () => withHost(call('demoFill')),
   lock: () => withHost(call('lock')),
   unlock: () => withHost(call('unlock')),
-  setDice: (dice: number[]) => withHost(call('setDice', dice)),
   draw: () => withHost(call('draw')),
   /** ส่งผลทั้งชุดเข้าชีทครั้งเดียว (Phase 4 ย้ายไปทำที่ server ตอนสุ่ม) */
   async sendSheet(): Promise<Result> {
@@ -51,17 +54,17 @@ export const gachaApi = {
     let state: 'sent' | 'local' | 'failed' = 'failed';
     try {
       const r = await fetch('/api/sheet', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'gacha', room: room.id, pairs: room.pairs.map(([from, to]) => ({ from, to })) }) });
+        body: JSON.stringify({ type: 'gacha', room: room.id, pairs: room.pairs.map(([from, to]) => ({ from, to })) }) }); // from = ผู้ให้, to = ผู้ได้รับ (จับได้ชื่อ from)
       const j = (await r.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
       state = j?.ok ? 'sent' : j?.error === 'not-configured' ? 'local' : 'failed';
     } catch { state = 'failed'; }
     await call('setSheet', state);
-    return state === 'failed' ? { ok: false, error: 'ส่งเข้าชีทไม่สำเร็จ — กดส่งซ้ำได้' } : ok(state === 'sent' ? 'ส่งผลเข้าชีทแล้ว' : 'ยังไม่ได้ตั้งค่าชีท (เก็บผลในเครื่อง/CSV)');
+    return state === 'failed' ? { ok: false, error: 'ส่งเข้าชีทไม่สำเร็จ — กดส่งซ้ำได้' } : ok(state === 'sent' ? 'ส่งผลเข้าชีทแล้ว' : 'ยังไม่ได้ตั้งค่าชีท (เก็บผลเป็น CSV)');
   },
 
   // ---------- พนักงาน ----------
-  async join(name: string): Promise<Result> {
-    const r = await call('join', name);
+  async join(personId: string | null, typed: string, lucky: number): Promise<Result> {
+    const r = await call('join', personId, typed, lucky);
     if (r.ok && r.data?.memberId) meSession.set({ roomId: r.data.roomId, memberId: r.data.memberId });
     return r;
   },

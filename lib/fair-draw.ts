@@ -2,21 +2,22 @@
  * สูตรสุ่มวงกลมแบบตรวจสอบได้ (ตู้กาชาปอง) — ใช้โค้ดชุดนี้ทั้งที่ server และหน้า "ตรวจผลด้วยตัวเอง"
  * ที่มา: docs/handoff/lucky-wheel-gacha/SPEC.md §4
  *
- * ผลขึ้นกับ (รายชื่อที่ล็อก + เลขจากลูกเต๋า) เท่านั้น → ข้อมูลเดิม = ผลเดิมทุกเครื่อง
+ * ผลขึ้นกับ (ป้าย "Lucky Number ชื่อ" ของทุกคนที่ล็อก + seed คงที่) เท่านั้น → ข้อมูลเดิม = ผลเดิมทุกเครื่อง
+ * ความสุ่มมาจากการ์ดที่แต่ละคนหยิบเองหน้าห้อง (ใครได้เลขไหน) — ไม่มีใครเลือกผลได้
  * ใช้ Intl.Collator('th') ที่กำหนด locale ชัดเจน + NFC normalize กันผลเรียงต่างกันระหว่าง Node กับเบราว์เซอร์
  */
 const collator = new Intl.Collator('th', { sensitivity: 'variant', numeric: true });
 
-export async function drawCircle(names: string[], diceNumber: string): Promise<[giver: string, receiver: string][]> {
+export async function drawCircle(names: string[], seed: string): Promise<[giver: string, receiver: string][]> {
   if (names.length < 3) throw new Error('ต้องมีอย่างน้อย 3 คน');
-  // 1) เรียงตามตัวอักษร ไม่มีใครจัดลำดับเองได้
+  // 1) เรียงตามตัวอักษร/ตัวเลข (ป้ายขึ้นต้นด้วย Lucky Number) ไม่มีใครจัดลำดับเองได้
   const ring = names.map((n) => n.normalize('NFC').trim()).sort(collator.compare);
   if (new Set(ring).size !== ring.length) throw new Error('มีชื่อซ้ำ');
 
   let round = 0;
   const random = async () => {
-    // 2) ตัวเลขสุ่มมาจากเลขที่คนในงานทอย + รายชื่อทั้งหมด เท่านั้น
-    const data = new TextEncoder().encode(`${diceNumber}|${ring.join(',')}|${round++}`);
+    // 2) ตัวเลขสุ่มมาจากรายชื่อพร้อมเลขทั้งหมด เท่านั้น
+    const data = new TextEncoder().encode(`${seed}|${ring.join(',')}|${round++}`);
     const digest = new Uint32Array(await crypto.subtle.digest('SHA-256', data));
     return digest[0] / 2 ** 32;
   };
@@ -26,7 +27,7 @@ export async function drawCircle(names: string[], diceNumber: string): Promise<[
     const j = Math.floor((await random()) * i);
     [ring[i], ring[j]] = [ring[j], ring[i]];
   }
-  // 4) แต่ละคนให้ของคนถัดไปในวง
+  // 4) แต่ละคนให้ของคนถัดไปในวง (= คนถัดไป "จับได้ชื่อ" คนนี้)
   return ring.map((name, i) => [name, ring[(i + 1) % ring.length]]);
 }
 
