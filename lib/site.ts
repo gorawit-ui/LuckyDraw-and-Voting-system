@@ -42,7 +42,7 @@ export const zones: Zone[] = [
     tag: '2 เกม',
     links: [
       { href: '/lucky/wheel', label: 'วงล้อคู่', icon: 'bi-bullseye', note: 'จอเวที · คนคุมกดเอง', mascot: '/brand/mascot/wheel.webp' },
-      { href: '/lucky/gacha', label: 'ตู้กาชาปอง', icon: 'bi-gift', note: 'มือถือทุกคน · จับคู่แลกของ', mascot: '/brand/mascot/gacha.webp' },
+      { href: '/lucky/gacha', label: 'ตู้กาชาปอง', icon: 'bi-gift', note: 'มือถือทุกคน · จับฉลากของขวัญด้วย Lucky Number', mascot: '/brand/mascot/gacha.webp' },
       { href: '/lucky/gacha/host', label: 'กาชาปอง · host', icon: 'bi-sliders' },
       { href: '/lucky/gacha/stage', label: 'กาชาปอง · จอเวที', icon: 'bi-easel' },
       { href: '/lucky/verify', label: 'ตรวจผลด้วยตัวเอง', icon: 'bi-shield-check' },

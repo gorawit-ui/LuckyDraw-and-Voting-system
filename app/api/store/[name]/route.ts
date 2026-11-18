@@ -19,7 +19,10 @@ const json = (body: unknown, status = 200) => NextResponse.json(body, { status, 
 async function load(name: string) {
   const def = stores[name];
   const snap = await kv().get(name);
-  return { def, rev: snap?.rev ?? 0, state: snap ? JSON.parse(snap.json) : def.seed() };
+  const seed = def.seed() as { v?: number };
+  const saved = snap ? JSON.parse(snap.json) : null;
+  // โครงสร้างข้อมูลเปลี่ยนเวอร์ชัน (เช่น กาชาปอง v1 → v2) → เริ่มจากข้อมูลตัวอย่างใหม่ (demo ไม่มีข้อมูลจริง)
+  return { def, rev: snap?.rev ?? 0, state: saved && saved.v === seed.v ? saved : seed };
 }
 
 export async function GET(req: Request, { params }: Params) {
